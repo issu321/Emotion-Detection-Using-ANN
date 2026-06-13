@@ -1,0 +1,338 @@
+{% extends "base.html" %}
+
+{% block title %}Input Guide - Emotion-Detection-Using-ANN{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .guide-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 4rem 2rem;
+    }
+
+    .guide-header {
+        text-align: center;
+        margin-bottom: 4rem;
+    }
+
+    .guide-header h1 {
+        font-size: 3.5rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #fff, var(--primary), var(--accent));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .guide-header p {
+        color: var(--gray);
+        font-size: 1.25rem;
+    }
+
+    .guide-section {
+        margin-bottom: 3rem;
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        border-radius: 1rem;
+        padding: 2rem;
+        transition: all 0.4s ease;
+    }
+
+    .guide-section:hover {
+        border-color: var(--primary);
+        transform: translateY(-5px);
+    }
+
+    .guide-section h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .guide-section h2 i {
+        color: var(--primary);
+    }
+
+    .guide-section p, .guide-section li {
+        color: var(--gray);
+        line-height: 1.8;
+    }
+
+    .guide-section ul {
+        margin-left: 1.5rem;
+        margin-top: 0.5rem;
+    }
+
+    .guide-section li {
+        margin-bottom: 0.5rem;
+    }
+
+    .format-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .format-item {
+        background: var(--darker);
+        border: 1px solid var(--glass-border);
+        border-radius: 0.75rem;
+        padding: 1rem;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .format-item:hover {
+        border-color: var(--primary);
+        transform: scale(1.05);
+    }
+
+    .format-item i {
+        font-size: 2rem;
+        color: var(--primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .format-item h4 {
+        font-size: 1rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .format-item span {
+        font-size: 0.8rem;
+        color: var(--gray);
+    }
+
+    .tip-box {
+        background: rgba(16, 185, 129, 0.1);
+        border: 1px solid var(--success);
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        margin-top: 1rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .tip-box i {
+        color: var(--success);
+        font-size: 1.5rem;
+        margin-top: 0.25rem;
+    }
+
+    .tip-box h4 {
+        color: var(--success);
+        margin-bottom: 0.5rem;
+    }
+
+    .warning-box {
+        background: rgba(245, 158, 11, 0.1);
+        border: 1px solid var(--warning);
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        margin-top: 1rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .warning-box i {
+        color: var(--warning);
+        font-size: 1.5rem;
+        margin-top: 0.25rem;
+    }
+
+    .warning-box h4 {
+        color: var(--warning);
+        margin-bottom: 0.5rem;
+    }
+
+    .step-number-large {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        color: white;
+        flex-shrink: 0;
+    }
+
+    .guide-step {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .guide-step-content h4 {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .demo-audio {
+        width: 100%;
+        margin-top: 1rem;
+        border-radius: 0.5rem;
+    }
+
+    .github-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-top: 1rem;
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .github-link:hover {
+        color: var(--secondary);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="guide-container">
+    <div class="guide-header">
+        <h1>Input Guide</h1>
+        <p>Learn how to get the best results from Emotion-Detection-Using-ANN</p>
+    </div>
+
+    <div class="guide-section">
+        <h2><i class="fas fa-file-audio"></i> Supported Audio Formats</h2>
+        <p>Our system supports all major audio formats for maximum compatibility:</p>
+        <div class="format-grid">
+            <div class="format-item">
+                <i class="fas fa-file-audio"></i>
+                <h4>WAV</h4>
+                <span>Best Quality</span>
+            </div>
+            <div class="format-item">
+                <i class="fas fa-file-audio"></i>
+                <h4>MP3</h4>
+                <span>Compressed</span>
+            </div>
+            <div class="format-item">
+                <i class="fas fa-file-audio"></i>
+                <h4>OGG</h4>
+                <span>Open Source</span>
+            </div>
+            <div class="format-item">
+                <i class="fas fa-file-audio"></i>
+                <h4>M4A</h4>
+                <span>Apple Format</span>
+            </div>
+            <div class="format-item">
+                <i class="fas fa-file-audio"></i>
+                <h4>FLAC</h4>
+                <span>Lossless</span>
+            </div>
+            <div class="format-item">
+                <i class="fas fa-file-audio"></i>
+                <h4>WEBM</h4>
+                <span>Web Format</span>
+            </div>
+        </div>
+        <div class="tip-box">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <h4>Pro Tip</h4>
+                <p>WAV and FLAC formats provide the best quality for emotion analysis since they are uncompressed or losslessly compressed. Avoid heavily compressed MP3s below 128kbps.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="guide-section">
+        <h2><i class="fas fa-microphone"></i> Recording Guidelines</h2>
+        <div class="guide-step">
+            <div class="step-number-large">1</div>
+            <div class="guide-step-content">
+                <h4>Quiet Environment</h4>
+                <p>Record in a quiet room with minimal background noise. Background music, traffic, or conversations can interfere with emotion detection accuracy.</p>
+            </div>
+        </div>
+        <div class="guide-step">
+            <div class="step-number-large">2</div>
+            <div class="guide-step-content">
+                <h4>Optimal Distance</h4>
+                <p>Keep the microphone 6-12 inches (15-30 cm) from your mouth. Too close may cause clipping; too far reduces signal quality.</p>
+            </div>
+        </div>
+        <div class="guide-step">
+            <div class="step-number-large">3</div>
+            <div class="guide-step-content">
+                <h4>Speak Naturally</h4>
+                <p>Speak in your natural voice at a comfortable volume. The system is designed to detect subtle emotional cues in normal speech patterns.</p>
+            </div>
+        </div>
+        <div class="guide-step">
+            <div class="step-number-large">4</div>
+            <div class="guide-step-content">
+                <h4>Duration</h4>
+                <p>Audio clips should be at least 3 seconds long for accurate feature extraction. The system analyzes the first 3 seconds of each file.</p>
+            </div>
+        </div>
+        <div class="warning-box">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <h4>Important</h4>
+                <p>Maximum file size is 32MB. For batch uploads, you can process up to 10 files simultaneously. Files longer than 3 seconds will be automatically trimmed from the beginning.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="guide-section">
+        <h2><i class="fas fa-sliders-h"></i> Audio Quality Tips</h2>
+        <ul>
+            <li>Use a sample rate of 22050 Hz or higher for best results</li>
+            <li>Mono (single channel) audio is preferred over stereo</li>
+            <li>16-bit depth is sufficient for emotion analysis</li>
+            <li>Avoid audio with heavy compression artifacts</li>
+            <li>Ensure consistent volume levels throughout the recording</li>
+            <li>Remove silence at the beginning and end of recordings</li>
+        </ul>
+    </div>
+
+    <div class="guide-section">
+        <h2><i class="fas fa-brain"></i> Understanding Results</h2>
+        <p>After analysis, you'll see:</p>
+        <ul>
+            <li><strong>Predicted Emotion:</strong> The most likely emotion detected</li>
+            <li><strong>Confidence Score:</strong> Percentage indicating model certainty (higher is better)</li>
+            <li><strong>Probability Distribution:</strong> Likelihood of all 7 emotions</li>
+            <li><strong>Waveform:</strong> Visual representation of the audio signal</li>
+            <li><strong>Top 3 Emotions:</strong> The three most likely emotions ranked</li>
+        </ul>
+        <div class="tip-box">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <h4>Confidence Threshold</h4>
+                <p>Confidence scores above 70% indicate high reliability. Scores between 50-70% suggest mixed emotions. Below 50% may indicate unclear audio or neutral emotional state.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="guide-section">
+        <h2><i class="fas fa-question-circle"></i> Troubleshooting</h2>
+        <ul>
+            <li><strong>Upload fails:</strong> Check file size (max 32MB) and format compatibility</li>
+            <li><strong>Low confidence:</strong> Ensure clear audio with minimal background noise</li>
+            <li><strong>Wrong emotion:</strong> Use the feedback button to help improve the model</li>
+            <li><strong>Recording issues:</strong> Allow microphone permissions in your browser</li>
+            <li><strong>Batch errors:</strong> Ensure all files are valid audio formats</li>
+        </ul>
+        <a href="{{ github_repo }}/issues" target="_blank" class="github-link">
+            <i class="fab fa-github"></i>
+            <span>Report issues on GitHub</span>
+        </a>
+    </div>
+</div>
+{% endblock %}

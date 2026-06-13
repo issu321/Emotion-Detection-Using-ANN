@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Emotion-Detection-Using-ANN{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .admin-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .admin-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding: 1.5rem 2rem;
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        border-radius: 1rem;
+    }
+
+    .admin-header h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+    }
+
+    .admin-header h1 span {
+        background: linear-gradient(135deg, var(--danger), var(--secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .admin-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .admin-stat-card {
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.4s ease;
+    }
+
+    .admin-stat-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--primary);
+    }
+
+    .admin-stat-card h4 {
+        color: var(--gray);
+        font-size: 0.875rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .admin-stat-card .value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .admin-section {
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .admin-section h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .admin-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .admin-table th {
+        text-align: left;
+        padding: 1rem;
+        color: var(--gray);
+        font-weight: 500;
+        font-size: 0.875rem;
+        border-bottom: 1px solid var(--glass-border);
+    }
+
+    .admin-table td {
+        padding: 1rem;
+        border-bottom: 1px solid var(--glass-border);
+    }
+
+    .admin-table tr:hover td {
+        background: rgba(99, 102, 241, 0.05);
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .status-active {
+        background: rgba(16, 185, 129, 0.2);
+        color: var(--success);
+    }
+
+    .chart-container {
+        position: relative;
+        height: 300px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <div class="admin-header">
+        <h1>Admin <span>Dashboard</span></h1>
+        <div class="user-info">
+            <div class="user-avatar" style="background: linear-gradient(135deg, var(--danger), var(--secondary));">{{ username[0].upper() }}</div>
+            <span>{{ username }}</span>
+        </div>
+    </div>
+
+    <div class="admin-stats">
+        <div class="admin-stat-card">
+            <h4>Total Users</h4>
+            <div class="value">{{ total_users }}</div>
+        </div>
+        <div class="admin-stat-card">
+            <h4>Total Analyses</h4>
+            <div class="value">{{ total_analyses }}</div>
+        </div>
+        <div class="admin-stat-card">
+            <h4>Today's Analyses</h4>
+            <div class="value">{{ today_analyses }}</div>
+        </div>
+        <div class="admin-stat-card">
+            <h4>Emotion Classes</h4>
+            <div class="value">7</div>
+        </div>
+    </div>
+
+    <div class="admin-section">
+        <h3><i class="fas fa-users"></i> Recent Users</h3>
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Joined</th>
+                    <th>Analyses</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in recent_users %}
+                <tr>
+                    <td>{{ user[0] }}</td>
+                    <td>{{ user[1] }}</td>
+                    <td>{{ user[2] }}</td>
+                    <td>{{ user[3] }}</td>
+                    <td>{{ user[4] }}</td>
+                    <td><span class="status-badge status-active"><i class="fas fa-circle" style="font-size: 0.5rem;"></i> Active</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="admin-section">
+        <h3><i class="fas fa-chart-pie"></i> Global Emotion Distribution</h3>
+        <div class="chart-container">
+            <canvas id="globalStatsChart"></canvas>
+        </div>
+    </div>
+
+    <div class="admin-section">
+        <h3><i class="fas fa-comments"></i> Recent Feedback</h3>
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>User</th>
+                    <th>Corrected Emotion</th>
+                    <th>Feedback</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for fb in recent_feedback %}
+                <tr>
+                    <td>{{ fb[0] }}</td>
+                    <td>{{ fb[1] }}</td>
+                    <td>{{ fb[2] }}</td>
+                    <td>{{ fb[3] }}</td>
+                    <td>{{ fb[4] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    const globalStats = {{ global_stats|tojson }};
+    const colors = ['#9CA3AF', '#FBBF24', '#60A5FA', '#EF4444', '#A78BFA', '#10B981', '#F97316'];
+
+    new Chart(document.getElementById('globalStatsChart'), {
+        type: 'bar',
+        data: {
+            labels: globalStats.map(s => s[0]),
+            datasets: [{
+                label: 'Count',
+                data: globalStats.map(s => s[1]),
+                backgroundColor: colors.map(c => c + '80'),
+                borderColor: colors,
+                borderWidth: 2,
+                borderRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#64748b' } },
+                x: { grid: { display: false }, ticks: { color: '#64748b' } }
+            }
+        }
+    });
+</script>
+{% endblock %}

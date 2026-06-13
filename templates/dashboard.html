@@ -1,0 +1,1924 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Emotion-Detection-Using-ANN{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .dashboard-container {
+        max-width: 1500px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding: 1.5rem 2rem;
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        border-radius: 1rem;
+        animation: slideDown 0.6s ease;
+    }
+
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .dashboard-header h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+    }
+
+    .dashboard-header h1 span {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .user-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        color: white;
+        font-size: 1.25rem;
+        box-shadow: 0 5px 20px rgba(99, 102, 241, 0.4);
+        animation: avatarPulse 3s ease infinite;
+    }
+
+    @keyframes avatarPulse {
+        0%, 100% { box-shadow: 0 5px 20px rgba(99, 102, 241, 0.4); }
+        50% { box-shadow: 0 5px 30px rgba(236, 72, 153, 0.5); }
+    }
+
+    .notification-bell {
+        position: relative;
+        background: none;
+        border: none;
+        color: var(--gray);
+        font-size: 1.25rem;
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .notification-bell:hover {
+        color: var(--primary);
+        background: var(--glass);
+    }
+
+    .notification-badge {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 18px;
+        height: 18px;
+        background: var(--danger);
+        border-radius: 50%;
+        font-size: 0.7rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        animation: bellShake 2s ease infinite;
+    }
+
+    @keyframes bellShake {
+        0%, 100% { transform: rotate(0); }
+        10% { transform: rotate(15deg); }
+        20% { transform: rotate(-15deg); }
+        30% { transform: rotate(10deg); }
+        40% { transform: rotate(-10deg); }
+        50% { transform: rotate(0); }
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.4s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+        transform: scaleX(0);
+        transition: transform 0.4s ease;
+    }
+
+    .stat-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    }
+
+    .stat-card h4 {
+        color: var(--gray);
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-card .stat-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .stat-card .stat-icon {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+        opacity: 0.7;
+    }
+
+    .upload-section {
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        border-radius: 1rem;
+        padding: 3rem 2rem;
+        text-align: center;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.4s ease;
+    }
+
+    .upload-section:hover {
+        border-color: rgba(99, 102, 241, 0.3);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .upload-section::before {
+        content: '';
+        position: absolute;
+        inset: -1px;
+        border-radius: 1rem;
+        background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: -1;
+        filter: blur(20px);
+    }
+
+    .upload-section:hover::before {
+        opacity: 0.3;
+    }
+
+    .upload-area {
+        border: 2px dashed var(--glass-border);
+        border-radius: 1rem;
+        padding: 3rem 2rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .upload-area:hover, .upload-area.dragover {
+        border-color: var(--primary);
+        background: rgba(99, 102, 241, 0.05);
+        transform: scale(1.02);
+    }
+
+    .upload-area i {
+        font-size: 3rem;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .upload-area:hover i {
+        transform: scale(1.2) rotate(5deg);
+    }
+
+    .upload-area h3 {
+        font-size: 1.25rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .upload-area p {
+        color: var(--gray);
+        font-size: 0.875rem;
+    }
+
+    .upload-area input[type="file"] {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .recording-btn {
+        margin-top: 1.5rem;
+        padding: 0.875rem 1.75rem;
+        background: linear-gradient(135deg, var(--danger), var(--secondary));
+        border: none;
+        border-radius: 0.75rem;
+        color: white;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1rem;
+    }
+
+    .recording-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(239, 68, 68, 0.4);
+    }
+
+    .recording-btn.recording {
+        animation: pulse-red 1.5s ease infinite;
+    }
+
+    @keyframes pulse-red {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
+        50% { box-shadow: 0 0 0 20px rgba(239, 68, 68, 0); }
+    }
+
+    .batch-btn {
+        margin-top: 1rem;
+        padding: 0.75rem 1.5rem;
+        background: linear-gradient(135deg, var(--accent), var(--primary));
+        border: none;
+        border-radius: 0.75rem;
+        color: white;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-left: 0.5rem;
+    }
+
+    .batch-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(6, 182, 212, 0.4);
+    }
+
+    .results-section {
+        display: none;
+        margin-bottom: 2rem;
+    }
+
+    .results-section.active {
+        display: block;
+        animation: fadeInUp 0.6s ease;
+    }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* New professional result styles */
+    .analysis-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .analysis-header h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .analysis-header h2 i {
+        color: var(--primary);
+    }
+
+    .result-meta {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.5rem;
+    }
+
+    .meta-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: var(--darker);
+        border: 1px solid var(--glass-border);
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        color: var(--gray);
+    }
+
+    .meta-tag i {
+        color: var(--primary);
+    }
+
+    .emotion-result {
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        border-radius: 1rem;
+        padding: 2.5rem;
+        text-align: center;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .emotion-result::before {
+        content: '';
+        position: absolute;
+        inset: -2px;
+        border-radius: 1.1rem;
+        background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+        opacity: 0.3;
+        z-index: -1;
+        filter: blur(20px);
+        animation: resultGlow 3s ease infinite;
+    }
+
+    @keyframes resultGlow {
+        0%, 100% { opacity: 0.2; }
+        50% { opacity: 0.4; }
+    }
+
+    .emotion-icon-large {
+        font-size: 6rem;
+        margin-bottom: 1rem;
+        animation: iconBounce 1s ease;
+    }
+
+    @keyframes iconBounce {
+        0% { transform: scale(0); }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1); }
+    }
+
+    .emotion-name {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        animation: fadeIn 0.8s ease 0.3s both;
+    }
+
+    .emotion-description {
+        color: var(--gray);
+        margin-bottom: 1rem;
+        font-size: 1.1rem;
+    }
+
+    .confidence-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.6rem 1.5rem;
+        border-radius: 2rem;
+        font-weight: 600;
+        font-size: 1.1rem;
+        background: rgba(16, 185, 129, 0.2);
+        color: var(--success);
+        animation: fadeIn 0.8s ease 0.5s both;
+    }
+
+    /* Confidence meter */
+    .confidence-meter-container {
+        max-width: 400px;
+        margin: 1.5rem auto;
+    }
+
+    .confidence-meter-label {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+        color: var(--gray);
+    }
+
+    .confidence-meter {
+        height: 12px;
+        background: var(--glass-border);
+        border-radius: 6px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .confidence-meter-fill {
+        height: 100%;
+        border-radius: 6px;
+        background: linear-gradient(90deg, var(--success), var(--primary), var(--secondary));
+        width: 0%;
+        transition: width 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        position: relative;
+    }
+
+    .confidence-meter-fill::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 20px;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4));
+        animation: shimmerBar 1.5s ease infinite;
+    }
+
+    @keyframes shimmerBar {
+        0% { transform: translateX(-20px); opacity: 0; }
+        50% { opacity: 1; }
+        100% { transform: translateX(20px); opacity: 0; }
+    }
+
+    /* Feature metrics grid */
+    .feature-metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin: 1.5rem 0;
+    }
+
+    .feature-metric-card {
+        background: var(--darker);
+        border: 1px solid var(--glass-border);
+        border-radius: 0.75rem;
+        padding: 1.25rem;
+        text-align: left;
+        transition: all 0.3s ease;
+    }
+
+    .feature-metric-card:hover {
+        border-color: var(--primary);
+        transform: translateY(-3px);
+    }
+
+    .feature-metric-card .metric-label {
+        font-size: 0.75rem;
+        color: var(--gray);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.5rem;
+    }
+
+    .feature-metric-card .metric-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--light);
+    }
+
+    .feature-metric-card .metric-bar {
+        height: 4px;
+        background: var(--glass-border);
+        border-radius: 2px;
+        margin-top: 0.75rem;
+        overflow: hidden;
+    }
+
+    .feature-metric-card .metric-bar-fill {
+        height: 100%;
+        border-radius: 2px;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+        width: 0%;
+        transition: width 1s ease;
+    }
+
+    /* Probability breakdown */
+    .probability-breakdown {
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .probability-breakdown h3 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .probability-breakdown h3 i {
+        color: var(--primary);
+    }
+
+    .prob-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .prob-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .prob-icon {
+        font-size: 1.25rem;
+        width: 30px;
+        text-align: center;
+    }
+
+    .prob-name {
+        width: 100px;
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+
+    .prob-bar-container {
+        flex: 1;
+        height: 8px;
+        background: var(--glass-border);
+        border-radius: 4px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .prob-bar-fill {
+        height: 100%;
+        border-radius: 4px;
+        width: 0%;
+        transition: width 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .prob-percent {
+        width: 50px;
+        text-align: right;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+
+    /* Analysis summary */
+    .analysis-summary {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(236, 72, 153, 0.1));
+        border: 1px solid var(--glass-border);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .analysis-summary h3 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .analysis-summary h3 i {
+        color: var(--primary);
+    }
+
+    .analysis-summary p {
+        color: var(--gray);
+        line-height: 1.7;
+        font-size: 0.95rem;
+    }
+
+    .analysis-summary .highlight {
+        color: var(--light);
+        font-weight: 600;
+    }
+
+    /* Pipeline steps */
+    .pipeline-steps {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin: 1.5rem 0;
+        flex-wrap: wrap;
+    }
+
+    .pipeline-step {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: var(--darker);
+        border: 1px solid var(--glass-border);
+        border-radius: 2rem;
+        font-size: 0.8rem;
+        color: var(--gray);
+        transition: all 0.3s ease;
+    }
+
+    .pipeline-step.active {
+        background: rgba(99, 102, 241, 0.2);
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+
+    .pipeline-step i {
+        font-size: 0.75rem;
+    }
+
+    .pipeline-arrow {
+        color: var(--gray);
+        font-size: 0.75rem;
+    }
+
+    .waveform-canvas {
+        width: 100%;
+        height: 140px;
+        margin: 1.5rem 0;
+        border-radius: 0.75rem;
+        background: rgba(0,0,0,0.25);
+    }
+
+    .top-3-emotions {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .top-emotion-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.6rem 1.2rem;
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        border-radius: 1rem;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+
+    .top-emotion-item:hover {
+        transform: scale(1.05);
+        border-color: var(--primary);
+    }
+
+    .charts-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .chart-card {
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        transition: all 0.4s ease;
+    }
+
+    .chart-card:hover {
+        border-color: rgba(99, 102, 241, 0.3);
+        transform: translateY(-5px);
+    }
+
+    .chart-card h3 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .chart-card h3 i {
+        color: var(--primary);
+    }
+
+    .chart-container {
+        position: relative;
+        height: 300px;
+    }
+
+    .history-section {
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .history-section h3 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .history-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .history-table th {
+        text-align: left;
+        padding: 1rem;
+        color: var(--gray);
+        font-weight: 500;
+        font-size: 0.875rem;
+        border-bottom: 1px solid var(--glass-border);
+    }
+
+    .history-table td {
+        padding: 1rem;
+        border-bottom: 1px solid var(--glass-border);
+        transition: all 0.3s ease;
+    }
+
+    .history-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .history-table tr:hover td {
+        background: rgba(99, 102, 241, 0.05);
+    }
+
+    .history-table tr {
+        transition: all 0.3s ease;
+    }
+
+    .history-table tr:hover {
+        transform: translateX(5px);
+    }
+
+    .history-checkbox {
+        width: 18px;
+        height: 18px;
+        accent-color: var(--primary);
+        cursor: pointer;
+    }
+
+    .action-btns {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .action-btn {
+        padding: 0.5rem 1rem;
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        border-radius: 0.5rem;
+        color: var(--light);
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .action-btn:hover {
+        background: var(--primary);
+        border-color: var(--primary);
+        transform: translateY(-2px);
+    }
+
+    .action-btn.danger:hover {
+        background: var(--danger);
+        border-color: var(--danger);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: var(--gray);
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    .loading-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(2, 6, 23, 0.95);
+        z-index: 2000;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 1.5rem;
+        backdrop-filter: blur(10px);
+    }
+
+    .loading-overlay.active {
+        display: flex;
+    }
+
+    .loading-spinner {
+        width: 70px;
+        height: 70px;
+        border: 4px solid var(--glass-border);
+        border-top-color: var(--primary);
+        border-right-color: var(--secondary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+        font-size: 1.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .loading-subtext {
+        color: var(--gray);
+    }
+
+    .wave-animation {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        height: 80px;
+    }
+
+    .wave-bar {
+        width: 5px;
+        background: linear-gradient(to top, var(--primary), var(--secondary));
+        border-radius: 3px;
+        animation: wave 1s ease-in-out infinite;
+    }
+
+    @keyframes wave {
+        0%, 100% { height: 20px; }
+        50% { height: 60px; }
+    }
+
+    .trend-section {
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .trend-section h3 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .settings-panel {
+        position: fixed;
+        top: 0;
+        right: -400px;
+        width: 400px;
+        height: 100vh;
+        background: var(--darker);
+        border-left: 1px solid var(--glass-border);
+        z-index: 1001;
+        padding: 2rem;
+        transition: right 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        overflow-y: auto;
+    }
+
+    .settings-panel.active {
+        right: 0;
+    }
+
+    .settings-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .settings-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .settings-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--glass-border);
+    }
+
+    .settings-header h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    .close-settings {
+        background: none;
+        border: none;
+        color: var(--gray);
+        font-size: 1.5rem;
+        cursor: pointer;
+        transition: color 0.3s ease;
+    }
+
+    .close-settings:hover {
+        color: var(--danger);
+    }
+
+    .setting-item {
+        margin-bottom: 1.5rem;
+    }
+
+    .setting-item label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: var(--gray);
+    }
+
+    .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 26px;
+    }
+
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        inset: 0;
+        background: var(--glass-border);
+        border-radius: 26px;
+        transition: 0.3s;
+    }
+
+    .toggle-slider::before {
+        content: '';
+        position: absolute;
+        height: 20px;
+        width: 20px;
+        left: 3px;
+        bottom: 3px;
+        background: white;
+        border-radius: 50%;
+        transition: 0.3s;
+    }
+
+    .toggle-switch input:checked + .toggle-slider {
+        background: var(--primary);
+    }
+
+    .toggle-switch input:checked + .toggle-slider::before {
+        transform: translateX(24px);
+    }
+
+    @media (max-width: 768px) {
+        .charts-grid {
+            grid-template-columns: 1fr;
+        }
+        .dashboard-header {
+            flex-direction: column;
+            gap: 1rem;
+            text-align: center;
+        }
+        .settings-panel {
+            width: 100%;
+            right: -100%;
+        }
+        .feature-metrics-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        .prob-name {
+            width: 70px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .feature-metrics-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1>Welcome, <span>{{ username }}</span></h1>
+        <div class="user-info">
+            <button class="notification-bell" id="notification-bell" onclick="showNotifications()">
+                <i class="fas fa-bell"></i>
+                {% if notifications %}
+                <span class="notification-badge">{{ notifications|length }}</span>
+                {% endif %}
+            </button>
+            <button class="action-btn" onclick="toggleSettings()">
+                <i class="fas fa-cog"></i> Settings
+            </button>
+            <div class="user-avatar">{{ username[0].upper() }}</div>
+            <span>{{ username }}</span>
+        </div>
+    </div>
+
+    <!-- Stats Overview -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-chart-bar"></i></div>
+            <h4>Total Analyses</h4>
+            <div class="stat-value" id="total-analyses">{{ history|length }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-smile"></i></div>
+            <h4>Emotions Detected</h4>
+            <div class="stat-value" id="emotions-detected">{{ stats|length }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-bullseye"></i></div>
+            <h4>Avg Confidence</h4>
+            <div class="stat-value" id="avg-confidence">-</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-clock"></i></div>
+            <h4>Last Analysis</h4>
+            <div class="stat-value" style="font-size: 1.25rem;" id="last-analysis">
+                {% if history %}{{ history[0][2].split(' ')[0] }}{% else %}-{% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Section -->
+    <div class="upload-section">
+        <div class="upload-area" id="upload-area">
+            <input type="file" id="audio-file" accept=".wav,.mp3,.ogg,.m4a,.flac,.webm" onchange="handleFileSelect(event)">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <h3>Upload Audio File</h3>
+            <p>Drag & drop or click to browse. Supports WAV, MP3, OGG, M4A, FLAC, WEBM</p>
+        </div>
+        <div style="margin-top: 1rem;">
+            <button class="recording-btn" id="record-btn" onclick="toggleRecording()">
+                <i class="fas fa-microphone"></i>
+                <span id="record-text">Record Audio</span>
+            </button>
+            <button class="batch-btn" onclick="document.getElementById('batch-files').click()">
+                <i class="fas fa-layer-group"></i>
+                <span>Batch Upload</span>
+            </button>
+            <input type="file" id="batch-files" multiple accept=".wav,.mp3,.ogg,.m4a,.flac,.webm" style="display: none;" onchange="handleBatchUpload(event)">
+        </div>
+    </div>
+
+    <!-- Results Section -->
+    <div class="results-section" id="results-section">
+        <div class="analysis-header">
+            <h2><i class="fas fa-microscope"></i> Analysis Report</h2>
+            <div class="result-meta" id="result-meta">
+                <span class="meta-tag"><i class="fas fa-file-audio"></i> <span id="meta-filename">-</span></span>
+                <span class="meta-tag"><i class="fas fa-clock"></i> <span id="meta-duration">-</span></span>
+                <span class="meta-tag"><i class="fas fa-database"></i> <span id="meta-size">-</span></span>
+                <span class="meta-tag"><i class="fas fa-wave-square"></i> <span id="meta-format">-</span></span>
+            </div>
+        </div>
+
+        <!-- Processing Pipeline -->
+        <div class="pipeline-steps" id="pipeline-steps">
+            <div class="pipeline-step active"><i class="fas fa-check"></i> Preprocessing</div>
+            <div class="pipeline-arrow"><i class="fas fa-chevron-right"></i></div>
+            <div class="pipeline-step active"><i class="fas fa-check"></i> Feature Extraction</div>
+            <div class="pipeline-arrow"><i class="fas fa-chevron-right"></i></div>
+            <div class="pipeline-step active"><i class="fas fa-check"></i> ANN Inference</div>
+            <div class="pipeline-arrow"><i class="fas fa-chevron-right"></i></div>
+            <div class="pipeline-step active"><i class="fas fa-check"></i> Classification</div>
+        </div>
+
+        <div class="emotion-result" id="emotion-result">
+            <div class="emotion-icon-large" id="emotion-icon"></div>
+            <div class="emotion-name" id="emotion-name"></div>
+            <div class="emotion-description" id="emotion-description"></div>
+            <div class="confidence-badge" id="confidence-badge">
+                <i class="fas fa-check-circle"></i>
+                <span id="confidence-text"></span>
+            </div>
+
+            <!-- Confidence Meter -->
+            <div class="confidence-meter-container">
+                <div class="confidence-meter-label">
+                    <span>Confidence Level</span>
+                    <span id="confidence-percent">0%</span>
+                </div>
+                <div class="confidence-meter">
+                    <div class="confidence-meter-fill" id="confidence-meter-fill"></div>
+                </div>
+            </div>
+
+            <canvas id="waveformCanvas" class="waveform-canvas"></canvas>
+
+            <div class="top-3-emotions" id="top-3-emotions"></div>
+        </div>
+
+        <!-- Feature Extraction Metrics -->
+        <div class="feature-metrics-grid" id="feature-metrics">
+            <div class="feature-metric-card">
+                <div class="metric-label">MFCC Mean</div>
+                <div class="metric-value" id="metric-mfcc">-</div>
+                <div class="metric-bar"><div class="metric-bar-fill" id="bar-mfcc"></div></div>
+            </div>
+            <div class="feature-metric-card">
+                <div class="metric-label">RMS Energy</div>
+                <div class="metric-value" id="metric-rms">-</div>
+                <div class="metric-bar"><div class="metric-bar-fill" id="bar-rms"></div></div>
+            </div>
+            <div class="feature-metric-card">
+                <div class="metric-label">Zero Crossing Rate</div>
+                <div class="metric-value" id="metric-zcr">-</div>
+                <div class="metric-bar"><div class="metric-bar-fill" id="bar-zcr"></div></div>
+            </div>
+            <div class="feature-metric-card">
+                <div class="metric-label">Spectral Centroid</div>
+                <div class="metric-value" id="metric-centroid">-</div>
+                <div class="metric-bar"><div class="metric-bar-fill" id="bar-centroid"></div></div>
+            </div>
+        </div>
+
+        <!-- Analysis Summary -->
+        <div class="analysis-summary" id="analysis-summary">
+            <h3><i class="fas fa-clipboard-check"></i> Analysis Summary</h3>
+            <p id="summary-text">Processing audio file...</p>
+        </div>
+
+        <!-- Probability Breakdown -->
+        <div class="probability-breakdown" id="probability-breakdown">
+            <h3><i class="fas fa-list-ol"></i> Detailed Probability Breakdown</h3>
+            <div id="prob-breakdown-content"></div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-card">
+                <h3><i class="fas fa-chart-bar"></i> Emotion Probabilities</h3>
+                <div class="chart-container">
+                    <canvas id="probabilityChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <h3><i class="fas fa-chart-pie"></i> Emotion Distribution</h3>
+                <div class="chart-container">
+                    <canvas id="distributionChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trend Section -->
+    <div class="trend-section">
+        <h3><i class="fas fa-chart-line"></i> Emotion Trend (Last 7 Days)</h3>
+        <div class="chart-container">
+            <canvas id="trendChart"></canvas>
+        </div>
+    </div>
+
+    <!-- History Section -->
+    <div class="history-section">
+        <h3><i class="fas fa-history"></i> Recent Analysis History</h3>
+        <div class="action-btns">
+            <button class="action-btn" onclick="exportData('csv')">
+                <i class="fas fa-file-csv"></i> Export CSV
+            </button>
+            <button class="action-btn" onclick="exportData('json')">
+                <i class="fas fa-file-code"></i> Export JSON
+            </button>
+            <button class="action-btn" onclick="compareSelected()">
+                <i class="fas fa-exchange-alt"></i> Compare Selected
+            </button>
+            <button class="action-btn danger" onclick="deleteSelected()">
+                <i class="fas fa-trash"></i> Delete Selected
+            </button>
+        </div>
+        {% if history %}
+        <table class="history-table">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" id="select-all" onchange="toggleSelectAll()"></th>
+                    <th>Emotion</th>
+                    <th>Confidence</th>
+                    <th>Date</th>
+                    <th>Duration</th>
+                    <th>File</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in history %}
+                <tr data-id="{{ item[4] }}">
+                    <td><input type="checkbox" class="history-checkbox" value="{{ item[4] }}"></td>
+                    <td>
+                        <span class="emotion-badge" style="background: {{ emotion_colors[item[0]] }}20; color: {{ emotion_colors[item[0]] }};">
+                            {{ emotion_icons[item[0]] }} {{ item[0] }}
+                        </span>
+                    </td>
+                    <td>{{ "%.1f"|format(item[1]*100) }}%</td>
+                    <td>{{ item[2] }}</td>
+                    <td>{{ "%.1f"|format(item[5]) }}s</td>
+                    <td>{{ item[3][:30] }}...</td>
+                    <td>
+                        <button class="action-btn" onclick="showFeedback({{ item[4] }}, '{{ item[0] }}')" title="Feedback">
+                            <i class="fas fa-comment"></i>
+                        </button>
+                        <button class="action-btn danger" onclick="deleteHistory({{ item[4] }})" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <p>No analysis history yet. Upload your first audio file to get started!</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Settings Panel -->
+<div class="settings-overlay" id="settings-overlay" onclick="toggleSettings()"></div>
+<div class="settings-panel" id="settings-panel">
+    <div class="settings-header">
+        <h2><i class="fas fa-cog"></i> Settings</h2>
+        <button class="close-settings" onclick="toggleSettings()">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="setting-item">
+        <label>Auto-refresh Charts</label>
+        <label class="toggle-switch">
+            <input type="checkbox" id="auto-refresh" checked>
+            <span class="toggle-slider"></span>
+        </label>
+    </div>
+    <div class="setting-item">
+        <label>Sound Effects</label>
+        <label class="toggle-switch">
+            <input type="checkbox" id="sound-effects">
+            <span class="toggle-slider"></span>
+        </label>
+    </div>
+    <div class="setting-item">
+        <label>Desktop Notifications</label>
+        <label class="toggle-switch">
+            <input type="checkbox" id="desktop-notif">
+            <span class="toggle-slider"></span>
+        </label>
+    </div>
+    <div class="setting-item">
+        <label>Compact History View</label>
+        <label class="toggle-switch">
+            <input type="checkbox" id="compact-view">
+            <span class="toggle-slider"></span>
+        </label>
+    </div>
+    <div class="setting-item">
+        <label>Show Waveform</label>
+        <label class="toggle-switch">
+            <input type="checkbox" id="show-waveform" checked>
+            <span class="toggle-slider"></span>
+        </label>
+    </div>
+    <div class="setting-item">
+        <button class="btn btn-primary btn-full" onclick="saveSettings()">
+            <i class="fas fa-save"></i> Save Settings
+        </button>
+    </div>
+</div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loading-overlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Analyzing Emotion...</div>
+    <div class="loading-subtext">Processing 191 audio features with ANN</div>
+    <div class="wave-animation" id="loading-waves">
+        <div class="wave-bar" style="animation-delay: 0s;"></div>
+        <div class="wave-bar" style="animation-delay: 0.1s;"></div>
+        <div class="wave-bar" style="animation-delay: 0.2s;"></div>
+        <div class="wave-bar" style="animation-delay: 0.3s;"></div>
+        <div class="wave-bar" style="animation-delay: 0.4s;"></div>
+        <div class="wave-bar" style="animation-delay: 0.5s;"></div>
+        <div class="wave-bar" style="animation-delay: 0.6s;"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    let probabilityChart = null;
+    let distributionChart = null;
+    let trendChart = null;
+    let isRecording = false;
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let waveformAnimationId = null;
+    let lastFileSize = 0;
+
+    const uploadArea = document.getElementById('upload-area');
+
+    uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.classList.add('dragover');
+    });
+
+    uploadArea.addEventListener('dragleave', () => {
+        uploadArea.classList.remove('dragover');
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.classList.remove('dragover');
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            handleFile(files[0]);
+        }
+    });
+
+    function handleFileSelect(event) {
+        const file = event.target.files[0];
+        if (file) {
+            handleFile(file);
+        }
+    }
+
+    function handleFile(file) {
+        const allowedExtensions = ['.wav', '.mp3', '.ogg', '.m4a', '.flac', '.webm'];
+        const ext = '.' + file.name.split('.').pop().toLowerCase();
+        if (!allowedExtensions.includes(ext)) {
+            showToast('Invalid file type. Please upload WAV, MP3, OGG, M4A, FLAC, or WEBM files.', 'error');
+            return;
+        }
+        lastFileSize = file.size;
+        uploadFile(file);
+    }
+
+    async function uploadFile(file) {
+        const loadingOverlay = document.getElementById('loading-overlay');
+        loadingOverlay.classList.add('active');
+
+        const formData = new FormData();
+        formData.append('audio', file);
+
+        try {
+            const response = await fetch('/predict', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                displayResults(result, file);
+                updateStats();
+                showToast(`Detected: ${result.predicted_emotion} (${(result.confidence * 100).toFixed(1)}%)`, 'success');
+            } else {
+                showToast(result.error || 'An error occurred', 'error');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showToast('Failed to upload file. Please try again.', 'error');
+        } finally {
+            loadingOverlay.classList.remove('active');
+        }
+    }
+
+    async function handleBatchUpload(event) {
+        const files = event.target.files;
+        if (!files.length) return;
+
+        const loadingOverlay = document.getElementById('loading-overlay');
+        loadingOverlay.classList.add('active');
+        document.querySelector('.loading-text').textContent = 'Processing Batch...';
+
+        const formData = new FormData();
+        for (let file of files) {
+            formData.append('files', file);
+        }
+
+        try {
+            const response = await fetch('/predict_batch', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                const successCount = result.processed;
+                showToast(`Batch complete: ${successCount}/${result.total} files processed`, 'success');
+                updateStats();
+                updateDistributionChart();
+            } else {
+                showToast(result.error || 'Batch processing failed', 'error');
+            }
+        } catch (error) {
+            showToast('Batch upload failed', 'error');
+        } finally {
+            loadingOverlay.classList.remove('active');
+            document.querySelector('.loading-text').textContent = 'Analyzing Emotion...';
+        }
+    }
+
+    function displayResults(result, file) {
+        const resultsSection = document.getElementById('results-section');
+        resultsSection.classList.add('active');
+
+        // File metadata
+        document.getElementById('meta-filename').textContent = file.name.length > 25 ? file.name.substring(0, 25) + '...' : file.name;
+        document.getElementById('meta-duration').textContent = (result.duration || 0).toFixed(2) + 's';
+        document.getElementById('meta-size').textContent = (lastFileSize / 1024).toFixed(1) + ' KB';
+        document.getElementById('meta-format').textContent = file.name.split('.').pop().toUpperCase();
+
+        // Emotion result
+        document.getElementById('emotion-icon').textContent = result.emotion_icon;
+        document.getElementById('emotion-name').textContent = result.predicted_emotion;
+        document.getElementById('emotion-name').style.color = result.emotion_color;
+        document.getElementById('emotion-description').textContent = result.emotion_description;
+        document.getElementById('confidence-text').textContent = (result.confidence * 100).toFixed(1) + '% Confidence';
+
+        // Confidence meter
+        const confPercent = (result.confidence * 100).toFixed(1);
+        document.getElementById('confidence-percent').textContent = confPercent + '%';
+        setTimeout(() => {
+            document.getElementById('confidence-meter-fill').style.width = confPercent + '%';
+        }, 300);
+
+        // Top 3 emotions
+        const top3Container = document.getElementById('top-3-emotions');
+        top3Container.innerHTML = '';
+        result.top_3.forEach((item, i) => {
+            const div = document.createElement('div');
+            div.className = 'top-emotion-item';
+            div.style.animation = `fadeIn 0.5s ease ${i * 0.2}s both`;
+            div.innerHTML = `
+                <span style="color: ${result.emotion_color};">${i+1}.</span>
+                <strong>${item.emotion}</strong>
+                <span style="color: var(--gray);">${(item.probability * 100).toFixed(1)}%</span>
+            `;
+            top3Container.appendChild(div);
+        });
+
+        // Waveform
+        if (document.getElementById('show-waveform').checked) {
+            drawWaveform(result.waveform);
+        }
+
+        // Feature metrics
+        const features = result.features || {};
+        document.getElementById('metric-mfcc').textContent = features.mfcc_mean ? features.mfcc_mean.toFixed(3) : '-';
+        document.getElementById('metric-rms').textContent = features.rms_energy ? features.rms_energy.toFixed(4) : '-';
+        document.getElementById('metric-zcr').textContent = features.zero_crossing_rate ? features.zero_crossing_rate.toFixed(4) : '-';
+        document.getElementById('metric-centroid').textContent = features.spectral_centroid ? features.spectral_centroid.toFixed(0) + ' Hz' : '-';
+
+        // Animate metric bars
+        setTimeout(() => {
+            document.getElementById('bar-mfcc').style.width = Math.min((features.mfcc_mean || 0) * 10, 100) + '%';
+            document.getElementById('bar-rms').style.width = Math.min((features.rms_energy || 0) * 500, 100) + '%';
+            document.getElementById('bar-zcr').style.width = Math.min((features.zero_crossing_rate || 0) * 2000, 100) + '%';
+            document.getElementById('bar-centroid').style.width = Math.min((features.spectral_centroid || 0) / 50, 100) + '%';
+        }, 500);
+
+        // Analysis summary
+        const summaryText = generateSummary(result, file);
+        document.getElementById('summary-text').innerHTML = summaryText;
+
+        // Probability breakdown
+        renderProbabilityBreakdown(result.all_probabilities, result.emotion_colors);
+
+        // Charts
+        updateProbabilityChart(result.all_probabilities);
+        updateDistributionChart();
+
+        // Scroll to results
+        resultsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function generateSummary(result, file) {
+        const emotion = result.predicted_emotion;
+        const confidence = (result.confidence * 100).toFixed(1);
+        const features = result.features || {};
+        const rms = features.rms_energy || 0;
+        const zcr = features.zero_crossing_rate || 0;
+        const centroid = features.spectral_centroid || 0;
+
+        let intensity = 'moderate';
+        if (rms > 0.12) intensity = 'high';
+        else if (rms < 0.05) intensity = 'low';
+
+        let pitch = 'neutral';
+        if (centroid > 3000) pitch = 'high';
+        else if (centroid < 1500) pitch = 'low';
+
+        return `
+            The audio sample <span class="highlight">"${file.name.length > 30 ? file.name.substring(0, 30) + '...' : file.name}"</span> 
+            was analyzed using our 4-layer ANN with 191 extracted features. The model predicts a 
+            <span class="highlight">${emotion}</span> emotional state with 
+            <span class="highlight">${confidence}% confidence</span>. 
+            Key acoustic indicators: ${intensity} energy intensity (RMS: ${rms.toFixed(4)}), 
+            ${pitch} spectral centroid (${centroid.toFixed(0)} Hz), and 
+            ${zcr > 0.05 ? 'elevated' : 'normal'} zero-crossing rate (${zcr.toFixed(4)}). 
+            The top alternative emotions were ${result.top_3[1].emotion} (${(result.top_3[1].probability * 100).toFixed(1)}%) 
+            and ${result.top_3[2].emotion} (${(result.top_3[2].probability * 100).toFixed(1)}%).
+        `;
+    }
+
+    function renderProbabilityBreakdown(probabilities, colors) {
+        const container = document.getElementById('prob-breakdown-content');
+        container.innerHTML = '';
+        const emotionOrder = ['Neutral', 'Happy', 'Sad', 'Angry', 'Fearful', 'Disgusted', 'Surprised'];
+        const emotionIcons = {
+            'Neutral': '😐', 'Happy': '😊', 'Sad': '😢', 'Angry': '😠',
+            'Fearful': '😨', 'Disgusted': '🤢', 'Surprised': '😲'
+        };
+        const emotionColors = {
+            'Neutral': '#9CA3AF', 'Happy': '#FBBF24', 'Sad': '#60A5FA', 'Angry': '#EF4444',
+            'Fearful': '#A78BFA', 'Disgusted': '#10B981', 'Surprised': '#F97316'
+        };
+
+        emotionOrder.forEach((emotion, i) => {
+            const prob = probabilities[emotion] || 0;
+            const percent = (prob * 100).toFixed(1);
+            const div = document.createElement('div');
+            div.className = 'prob-item';
+            div.style.animation = `fadeIn 0.4s ease ${i * 0.1}s both`;
+            div.innerHTML = `
+                <span class="prob-icon">${emotionIcons[emotion]}</span>
+                <span class="prob-name">${emotion}</span>
+                <div class="prob-bar-container">
+                    <div class="prob-bar-fill" style="background: ${emotionColors[emotion]}; width: 0%;"></div>
+                </div>
+                <span class="prob-percent" style="color: ${emotionColors[emotion]};">${percent}%</span>
+            `;
+            container.appendChild(div);
+            setTimeout(() => {
+                div.querySelector('.prob-bar-fill').style.width = percent + '%';
+            }, 400 + i * 100);
+        });
+    }
+
+    function drawWaveform(data) {
+        const canvas = document.getElementById('waveformCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+
+        const width = canvas.width;
+        const height = canvas.height;
+        const barWidth = width / data.length;
+
+        let frame = 0;
+        function animate() {
+            if (!document.getElementById('results-section').classList.contains('active')) return;
+
+            ctx.clearRect(0, 0, width, height);
+
+            data.forEach((value, i) => {
+                const barHeight = Math.abs(value) * height * 0.4 * (1 + Math.sin(frame * 0.05 + i * 0.1) * 0.3);
+                const x = i * barWidth;
+                const y = (height - barHeight) / 2;
+
+                const gradient = ctx.createLinearGradient(0, y, 0, y + barHeight);
+                gradient.addColorStop(0, 'rgba(99, 102, 241, 0.8)');
+                gradient.addColorStop(0.5, 'rgba(236, 72, 153, 0.8)');
+                gradient.addColorStop(1, 'rgba(6, 182, 212, 0.8)');
+                ctx.fillStyle = gradient;
+
+                ctx.fillRect(x, y, barWidth - 1, barHeight);
+            });
+
+            frame++;
+            waveformAnimationId = requestAnimationFrame(animate);
+        }
+
+        if (waveformAnimationId) cancelAnimationFrame(waveformAnimationId);
+        animate();
+    }
+
+    function updateProbabilityChart(probabilities) {
+        const ctx = document.getElementById('probabilityChart').getContext('2d');
+        if (probabilityChart) probabilityChart.destroy();
+
+        const labels = Object.keys(probabilities);
+        const data = Object.values(probabilities);
+        const colors = ['#9CA3AF', '#FBBF24', '#60A5FA', '#EF4444', '#A78BFA', '#10B981', '#F97316'];
+
+        probabilityChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Probability',
+                    data: data,
+                    backgroundColor: colors.map(c => c + '80'),
+                    borderColor: colors,
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    hoverBackgroundColor: colors,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: { duration: 1000, easing: 'easeOutQuart' },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        borderColor: 'rgba(99, 102, 241, 0.3)',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                    }
+                },
+                scales: {
+                    y: { beginAtZero: true, max: 1, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#64748b' } },
+                    x: { grid: { display: false }, ticks: { color: '#64748b' } }
+                }
+            }
+        });
+    }
+
+    async function updateDistributionChart() {
+        try {
+            const response = await fetch('/api/stats');
+            const stats = await response.json();
+            const ctx = document.getElementById('distributionChart').getContext('2d');
+            if (distributionChart) distributionChart.destroy();
+
+            const labels = stats.emotions.map(s => s.emotion);
+            const data = stats.emotions.map(s => s.count);
+            const colors = ['#9CA3AF', '#FBBF24', '#60A5FA', '#EF4444', '#A78BFA', '#10B981', '#F97316'];
+
+            distributionChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: { labels: labels, datasets: [{ data: data, backgroundColor: colors, borderColor: '#0f172a', borderWidth: 3, hoverOffset: 10 }] },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: { animateRotate: true, animateScale: true, duration: 1500 },
+                    plugins: {
+                        legend: { position: 'bottom', labels: { color: '#64748b', padding: 20, usePointStyle: true } }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Error fetching stats:', error);
+        }
+    }
+
+    async function updateTrendChart() {
+        try {
+            const response = await fetch('/api/trend?days=7');
+            const trend = await response.json();
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            if (trendChart) trendChart.destroy();
+
+            const dates = Object.keys(trend).sort();
+            const emotions = ['Neutral', 'Happy', 'Sad', 'Angry', 'Fearful', 'Disgusted', 'Surprised'];
+            const colors = ['#9CA3AF', '#FBBF24', '#60A5FA', '#EF4444', '#A78BFA', '#10B981', '#F97316'];
+
+            const datasets = emotions.map((emotion, i) => ({
+                label: emotion,
+                data: dates.map(date => trend[date]?.[emotion]?.count || 0),
+                borderColor: colors[i],
+                backgroundColor: colors[i] + '20',
+                fill: true,
+                tension: 0.4,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }));
+
+            trendChart = new Chart(ctx, {
+                type: 'line',
+                data: { labels: dates, datasets: datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { position: 'bottom', labels: { color: '#64748b', usePointStyle: true } }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#64748b' } },
+                        x: { grid: { display: false }, ticks: { color: '#64748b' } }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Error fetching trend:', error);
+        }
+    }
+
+    async function updateStats() {
+        try {
+            const response = await fetch('/api/stats');
+            const stats = await response.json();
+            const totalAnalyses = stats.emotions.reduce((sum, s) => sum + s.count, 0);
+            document.getElementById('total-analyses').textContent = totalAnalyses;
+            document.getElementById('emotions-detected').textContent = stats.emotions.length;
+            if (stats.emotions.length > 0) {
+                const avgConf = stats.emotions.reduce((sum, s) => sum + s.avg_confidence, 0) / stats.emotions.length;
+                document.getElementById('avg-confidence').textContent = (avgConf * 100).toFixed(1) + '%';
+            }
+            updateTrendChart();
+        } catch (error) {
+            console.error('Error updating stats:', error);
+        }
+    }
+
+    async function toggleRecording() {
+        const btn = document.getElementById('record-btn');
+        const text = document.getElementById('record-text');
+
+        if (!isRecording) {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                mediaRecorder.ondataavailable = (e) => { audioChunks.push(e.data); };
+                mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    const audioFile = new File([audioBlob], 'recording.wav', { type: 'audio/wav' });
+                    lastFileSize = audioBlob.size;
+                    uploadFile(audioFile);
+                    stream.getTracks().forEach(track => track.stop());
+                };
+                mediaRecorder.start();
+                isRecording = true;
+                btn.classList.add('recording');
+                text.textContent = 'Stop Recording';
+                showToast('Recording started...', 'info');
+            } catch (err) {
+                showToast('Could not access microphone. Please check permissions.', 'error');
+            }
+        } else {
+            mediaRecorder.stop();
+            isRecording = false;
+            btn.classList.remove('recording');
+            text.textContent = 'Record Audio';
+            showToast('Recording stopped. Processing...', 'info');
+        }
+    }
+
+    function exportData(format) {
+        window.open(`/api/export/${format}`, '_blank');
+        showToast(`Exporting as ${format.toUpperCase()}...`, 'success');
+    }
+
+    function toggleSelectAll() {
+        const selectAll = document.getElementById('select-all');
+        const checkboxes = document.querySelectorAll('.history-checkbox');
+        checkboxes.forEach(cb => cb.checked = selectAll.checked);
+    }
+
+    async function deleteHistory(id) {
+        if (!confirm('Are you sure you want to delete this record?')) return;
+        try {
+            const response = await fetch(`/api/delete_history/${id}`, { method: 'DELETE' });
+            const result = await response.json();
+            if (result.success) {
+                showToast('Record deleted successfully', 'success');
+                location.reload();
+            }
+        } catch (error) {
+            showToast('Failed to delete record', 'error');
+        }
+    }
+
+    async function deleteSelected() {
+        const selected = document.querySelectorAll('.history-checkbox:checked');
+        if (selected.length === 0) { showToast('No records selected', 'warning'); return; }
+        if (!confirm(`Delete ${selected.length} selected records?`)) return;
+        for (const cb of selected) {
+            await fetch(`/api/delete_history/${cb.value}`, { method: 'DELETE' });
+        }
+        showToast('Selected records deleted', 'success');
+        location.reload();
+    }
+
+    async function compareSelected() {
+        const selected = document.querySelectorAll('.history-checkbox:checked');
+        if (selected.length < 2) { showToast('Select at least 2 records to compare', 'warning'); return; }
+        const ids = Array.from(selected).map(cb => cb.value).join(',');
+        window.open(`/api/compare?ids=${ids}`, '_blank');
+    }
+
+    async function showFeedback(historyId, currentEmotion) {
+        const correctEmotion = prompt(`Current prediction: ${currentEmotion}\n\nEnter the correct emotion if this is wrong:`, currentEmotion);
+        if (correctEmotion && correctEmotion !== currentEmotion) {
+            try {
+                await fetch('/api/feedback', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ history_id: historyId, correct_emotion: correctEmotion, feedback_text: 'User correction' })
+                });
+                showToast('Feedback submitted. Thank you!', 'success');
+            } catch (error) {
+                showToast('Failed to submit feedback', 'error');
+            }
+        }
+    }
+
+    function toggleSettings() {
+        document.getElementById('settings-panel').classList.toggle('active');
+        document.getElementById('settings-overlay').classList.toggle('active');
+    }
+
+    async function saveSettings() {
+        const settings = {
+            auto_refresh: document.getElementById('auto-refresh').checked,
+            sound_effects: document.getElementById('sound-effects').checked,
+            desktop_notifications: document.getElementById('desktop-notif').checked,
+            compact_view: document.getElementById('compact-view').checked,
+            show_waveform: document.getElementById('show-waveform').checked
+        };
+        try {
+            await fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(settings)
+            });
+            showToast('Settings saved successfully', 'success');
+            toggleSettings();
+        } catch (error) {
+            showToast('Failed to save settings', 'error');
+        }
+    }
+
+    async function showNotifications() {
+        try {
+            const response = await fetch('/api/notifications');
+            const notifications = await response.json();
+            if (notifications.length === 0) { showToast('No new notifications', 'info'); return; }
+            notifications.forEach(n => { showToast(`${n.title}: ${n.message}`, n.type); });
+            for (const n of notifications) { if (!n.is_read) await fetch(`/api/notifications/${n.id}/read`, { method: 'POST' }); }
+            document.querySelector('.notification-badge')?.remove();
+        } catch (error) { console.error('Error fetching notifications:', error); }
+    }
+
+    updateDistributionChart();
+    updateStats();
+    updateTrendChart();
+</script>
+{% endblock %}

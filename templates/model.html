@@ -1,0 +1,364 @@
+{% extends "base.html" %}
+
+{% block title %}Model Architecture - Emotion-Detection-Using-ANN{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .model-container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 4rem 2rem;
+    }
+
+    .model-header {
+        text-align: center;
+        margin-bottom: 4rem;
+    }
+
+    .model-header h1 {
+        font-size: 3.5rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #fff, var(--primary), var(--accent));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .model-header p {
+        color: var(--gray);
+        font-size: 1.25rem;
+    }
+
+    .architecture-section {
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        border-radius: 1rem;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        transition: all 0.4s ease;
+    }
+
+    .architecture-section:hover {
+        border-color: var(--primary);
+    }
+
+    .architecture-section h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .architecture-section h2 i {
+        color: var(--primary);
+    }
+
+    .layer-visual {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 2rem 0;
+    }
+
+    .layer-box {
+        width: 100%;
+        max-width: 500px;
+        padding: 1rem;
+        border-radius: 0.75rem;
+        text-align: center;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .layer-box:hover {
+        transform: scale(1.02);
+    }
+
+    .layer-input {
+        background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(6, 182, 212, 0.1));
+        border: 2px solid var(--accent);
+        color: var(--accent);
+    }
+
+    .layer-hidden {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(99, 102, 241, 0.1));
+        border: 2px solid var(--primary);
+        color: var(--primary);
+    }
+
+    .layer-output {
+        background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(236, 72, 153, 0.1));
+        border: 2px solid var(--secondary);
+        color: var(--secondary);
+    }
+
+    .layer-arrow {
+        color: var(--gray);
+        font-size: 1.5rem;
+        animation: arrowBounce 1.5s ease infinite;
+    }
+
+    @keyframes arrowBounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(5px); }
+    }
+
+    .stats-grid-2 {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .stat-box {
+        background: var(--darker);
+        border: 1px solid var(--glass-border);
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .stat-box:hover {
+        border-color: var(--primary);
+        transform: translateY(-3px);
+    }
+
+    .stat-box h4 {
+        color: var(--gray);
+        font-size: 0.875rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-box .value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary);
+    }
+
+    .feature-list-detailed {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .feature-detail-item {
+        background: var(--darker);
+        border: 1px solid var(--glass-border);
+        border-radius: 0.75rem;
+        padding: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .feature-detail-item:hover {
+        border-color: var(--primary);
+        transform: translateX(5px);
+    }
+
+    .feature-detail-item i {
+        color: var(--primary);
+        font-size: 1.25rem;
+    }
+
+    .feature-detail-item h4 {
+        font-size: 0.95rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .feature-detail-item span {
+        color: var(--gray);
+        font-size: 0.8rem;
+    }
+
+    .training-chart-container {
+        height: 250px;
+        margin-top: 1rem;
+    }
+
+    .code-block {
+        background: var(--darker);
+        border: 1px solid var(--glass-border);
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        margin-top: 1rem;
+        font-family: 'Courier New', monospace;
+        font-size: 0.875rem;
+        overflow-x: auto;
+        color: var(--gray);
+    }
+
+    .code-block .comment { color: var(--success); }
+    .code-block .keyword { color: var(--primary); }
+    .code-block .string { color: var(--secondary); }
+    .code-block .number { color: var(--accent); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="model-container">
+    <div class="model-header">
+        <h1>ANN Model Architecture</h1>
+        <p>Deep dive into the neural network powering our emotion recognition system</p>
+    </div>
+
+    <div class="architecture-section">
+        <h2><i class="fas fa-sitemap"></i> Network Structure</h2>
+        <div class="layer-visual">
+            <div class="layer-box layer-input">
+                <div>Input Layer</div>
+                <div style="font-size: 0.875rem; opacity: 0.8;">191 Features (MFCC, Chroma, Mel, Spectral, Temporal)</div>
+            </div>
+            <div class="layer-arrow"><i class="fas fa-arrow-down"></i></div>
+            <div class="layer-box layer-hidden">
+                <div>Hidden Layer 1</div>
+                <div style="font-size: 0.875rem; opacity: 0.8;">256 Neurons + BatchNorm + Dropout(0.3)</div>
+            </div>
+            <div class="layer-arrow"><i class="fas fa-arrow-down"></i></div>
+            <div class="layer-box layer-hidden">
+                <div>Hidden Layer 2</div>
+                <div style="font-size: 0.875rem; opacity: 0.8;">128 Neurons + BatchNorm + Dropout(0.3)</div>
+            </div>
+            <div class="layer-arrow"><i class="fas fa-arrow-down"></i></div>
+            <div class="layer-box layer-hidden">
+                <div>Hidden Layer 3</div>
+                <div style="font-size: 0.875rem; opacity: 0.8;">64 Neurons + BatchNorm + Dropout(0.3)</div>
+            </div>
+            <div class="layer-arrow"><i class="fas fa-arrow-down"></i></div>
+            <div class="layer-box layer-hidden">
+                <div>Hidden Layer 4</div>
+                <div style="font-size: 0.875rem; opacity: 0.8;">32 Neurons + BatchNorm</div>
+            </div>
+            <div class="layer-arrow"><i class="fas fa-arrow-down"></i></div>
+            <div class="layer-box layer-output">
+                <div>Output Layer</div>
+                <div style="font-size: 0.875rem; opacity: 0.8;">7 Emotions (Softmax Activation)</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="architecture-section">
+        <h2><i class="fas fa-chart-bar"></i> Model Statistics</h2>
+        <div class="stats-grid-2">
+            <div class="stat-box">
+                <h4>Total Parameters</h4>
+                <div class="value">~85K</div>
+            </div>
+            <div class="stat-box">
+                <h4>Hidden Layers</h4>
+                <div class="value">4</div>
+            </div>
+            <div class="stat-box">
+                <h4>Input Features</h4>
+                <div class="value">191</div>
+            </div>
+            <div class="stat-box">
+                <h4>Output Classes</h4>
+                <div class="value">7</div>
+            </div>
+            <div class="stat-box">
+                <h4>Dropout Rate</h4>
+                <div class="value">0.3</div>
+            </div>
+            <div class="stat-box">
+                <h4>Activation</h4>
+                <div class="value">ReLU</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="architecture-section">
+        <h2><i class="fas fa-wave-square"></i> Feature Extraction Pipeline</h2>
+        <p>Our system extracts 191 features from each audio sample using the following pipeline:</p>
+        <div class="feature-list-detailed">
+            <div class="feature-detail-item">
+                <i class="fas fa-sliders-h"></i>
+                <div>
+                    <h4>MFCC (40 coefficients)</h4>
+                    <span>Mel-Frequency Cepstral Coefficients</span>
+                </div>
+            </div>
+            <div class="feature-detail-item">
+                <i class="fas fa-music"></i>
+                <div>
+                    <h4>Chroma (12 bins)</h4>
+                    <span>Chroma Energy Normalized</span>
+                </div>
+            </div>
+            <div class="feature-detail-item">
+                <i class="fas fa-chart-area"></i>
+                <div>
+                    <h4>Mel Spectrogram (20 bins)</h4>
+                    <span>Mel-frequency power spectrogram</span>
+                </div>
+            </div>
+            <div class="feature-detail-item">
+                <i class="fas fa-adjust"></i>
+                <div>
+                    <h4>Spectral Contrast (7 bands)</h4>
+                    <span>Spectral contrast features</span>
+                </div>
+            </div>
+            <div class="feature-detail-item">
+                <i class="fas fa-wave-square"></i>
+                <div>
+                    <h4>Zero Crossing Rate</h4>
+                    <span>Rate of sign changes in signal</span>
+                </div>
+            </div>
+            <div class="feature-detail-item">
+                <i class="fas fa-bolt"></i>
+                <div>
+                    <h4>RMS Energy</h4>
+                    <span>Root Mean Square energy</span>
+                </div>
+            </div>
+            <div class="feature-detail-item">
+                <i class="fas fa-bullseye"></i>
+                <div>
+                    <h4>Spectral Centroid</h4>
+                    <span>Center of spectral mass</span>
+                </div>
+            </div>
+            <div class="feature-detail-item">
+                <i class="fas fa-chart-line"></i>
+                <div>
+                    <h4>Spectral Rolloff</h4>
+                    <span>Frequency below which 85% energy lies</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="architecture-section">
+        <h2><i class="fas fa-code"></i> Training Configuration</h2>
+        <div class="code-block">
+<span class="comment"># Model Training Configuration</span>
+<span class="keyword">optimizer</span> = <span class="string">'Adam'</span>
+<span class="keyword">learning_rate</span> = <span class="number">0.001</span>
+<span class="keyword">epochs</span> = <span class="number">200</span>
+<span class="keyword">batch_size</span> = <span class="number">32</span>
+<span class="keyword">validation_split</span> = <span class="number">0.2</span>
+<span class="keyword">loss_function</span> = <span class="string">'categorical_crossentropy'</span>
+<span class="keyword">metrics</span> = [<span class="string">'accuracy'</span>, <span class="string">'precision'</span>, <span class="string">'recall'</span>]
+<span class="keyword">early_stopping</span> = <span class="number">True</span>
+<span class="keyword">patience</span> = <span class="number">20</span>
+        </div>
+    </div>
+
+    <div class="architecture-section">
+        <h2><i class="fas fa-info-circle"></i> Model Information API</h2>
+        <p>Access detailed model information programmatically via the <code>/api/model_info</code> endpoint. This returns the complete model architecture, feature specifications, and training parameters in JSON format.</p>
+        <a href="/api/model_info" target="_blank" class="btn btn-primary" style="margin-top: 1rem;">
+            <i class="fas fa-code"></i> View API Response
+        </a>
+    </div>
+</div>
+{% endblock %}

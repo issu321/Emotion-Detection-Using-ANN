@@ -1,0 +1,774 @@
+{% extends "base.html" %}
+
+{% block title %}Emotion-Detection-Using-ANN - Speech Emotion Recognition{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .hero {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-content {
+        max-width: 900px;
+        z-index: 1;
+        position: relative;
+    }
+
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.6rem 1.5rem;
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        border-radius: 2rem;
+        font-size: 0.875rem;
+        color: var(--accent);
+        margin-bottom: 2rem;
+        animation: badgePulse 2s ease infinite;
+        backdrop-filter: blur(10px);
+    }
+
+    @keyframes badgePulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.4); transform: scale(1); }
+        50% { box-shadow: 0 0 0 15px rgba(6, 182, 212, 0); transform: scale(1.02); }
+    }
+
+    .hero h1 {
+        font-size: 5rem;
+        font-weight: 800;
+        line-height: 1.1;
+        margin-bottom: 1.5rem;
+        background: linear-gradient(135deg, #fff 0%, var(--primary) 30%, var(--secondary) 60%, var(--accent) 100%);
+        background-size: 300% 300%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: gradientText 6s ease infinite;
+    }
+
+    @keyframes gradientText {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+
+    .hero p {
+        font-size: 1.35rem;
+        color: var(--gray);
+        margin-bottom: 2.5rem;
+        line-height: 1.8;
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .hero-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .hero-visual {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.08;
+        pointer-events: none;
+    }
+
+    .hero-visual i {
+        font-size: 25rem;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: heroIconFloat 6s ease-in-out infinite;
+    }
+
+    @keyframes heroIconFloat {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        50% { transform: translateY(-30px) rotate(5deg); }
+    }
+
+    /* Floating orbs */
+    .orb {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(60px);
+        opacity: 0.3;
+        pointer-events: none;
+    }
+
+    .orb-1 {
+        width: 300px;
+        height: 300px;
+        background: var(--primary);
+        top: 10%;
+        left: 10%;
+        animation: orbFloat1 8s ease-in-out infinite;
+    }
+
+    .orb-2 {
+        width: 250px;
+        height: 250px;
+        background: var(--secondary);
+        bottom: 20%;
+        right: 10%;
+        animation: orbFloat2 10s ease-in-out infinite;
+    }
+
+    .orb-3 {
+        width: 200px;
+        height: 200px;
+        background: var(--accent);
+        top: 50%;
+        right: 20%;
+        animation: orbFloat3 7s ease-in-out infinite;
+    }
+
+    @keyframes orbFloat1 {
+        0%, 100% { transform: translate(0, 0) scale(1); }
+        33% { transform: translate(30px, -50px) scale(1.1); }
+        66% { transform: translate(-20px, 30px) scale(0.9); }
+    }
+
+    @keyframes orbFloat2 {
+        0%, 100% { transform: translate(0, 0) scale(1); }
+        33% { transform: translate(-40px, -30px) scale(1.2); }
+        66% { transform: translate(20px, 40px) scale(0.8); }
+    }
+
+    @keyframes orbFloat3 {
+        0%, 100% { transform: translate(0, 0) scale(1); }
+        50% { transform: translate(50px, 20px) scale(1.1); }
+    }
+
+    .features-section {
+        padding: 6rem 2rem;
+        position: relative;
+    }
+
+    .section-title {
+        text-align: center;
+        margin-bottom: 4rem;
+    }
+
+    .section-title h2 {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #fff, var(--primary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .section-title p {
+        color: var(--gray);
+        font-size: 1.25rem;
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 2rem;
+        max-width: 1300px;
+        margin: 0 auto;
+    }
+
+    .feature-card {
+        background: var(--glass);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 1.5rem;
+        padding: 2.5rem;
+        transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+    }
+
+    .feature-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+        transform: scaleX(0);
+        transition: transform 0.5s ease;
+    }
+
+    .feature-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .feature-card::after {
+        content: '';
+        position: absolute;
+        inset: -1px;
+        border-radius: 1.5rem;
+        background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: -1;
+        filter: blur(15px);
+    }
+
+    .feature-card:hover::after {
+        opacity: 0.4;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-15px) scale(1.03);
+        border-color: rgba(99, 102, 241, 0.3);
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+    }
+
+    .feature-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.75rem;
+        margin-bottom: 1.5rem;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        transition: all 0.4s ease;
+        position: relative;
+    }
+
+    .feature-card:hover .feature-icon {
+        transform: rotateY(360deg) scale(1.1);
+        box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+    }
+
+    .feature-icon::after {
+        content: '';
+        position: absolute;
+        inset: -5px;
+        border-radius: 1.5rem;
+        background: inherit;
+        opacity: 0.3;
+        filter: blur(10px);
+        z-index: -1;
+    }
+
+    .feature-card h3 {
+        font-size: 1.35rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+    }
+
+    .feature-card p {
+        color: var(--gray);
+        line-height: 1.7;
+    }
+
+    .stats-section {
+        padding: 6rem 2rem;
+        background: linear-gradient(180deg, transparent, rgba(99, 102, 241, 0.05), transparent);
+        position: relative;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 2rem;
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 2.5rem;
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        border-radius: 1.5rem;
+        transition: all 0.4s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-item::before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+        transform: scaleX(0);
+        transition: transform 0.4s ease;
+    }
+
+    .stat-item:hover::before {
+        transform: scaleX(1);
+    }
+
+    .stat-item:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .stat-number {
+        font-size: 3.5rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.5rem;
+        line-height: 1;
+    }
+
+    .stat-label {
+        color: var(--gray);
+        font-weight: 500;
+        font-size: 1.1rem;
+    }
+
+    .cta-section {
+        padding: 6rem 2rem;
+        text-align: center;
+        position: relative;
+    }
+
+    .cta-card {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 5rem 3rem;
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(236, 72, 153, 0.1));
+        border: 1px solid var(--glass-border);
+        border-radius: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cta-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+        animation: rotate 20s linear infinite;
+    }
+
+    .cta-card::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 2rem;
+        background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.05) 50%, transparent 60%);
+        background-size: 200% 200%;
+        animation: shimmer 3s ease infinite;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    @keyframes shimmer {
+        0% { background-position: 200% 200%; }
+        100% { background-position: -200% -200%; }
+    }
+
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .cta-card h2 {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .cta-card p {
+        color: var(--gray);
+        margin-bottom: 2.5rem;
+        position: relative;
+        z-index: 1;
+        font-size: 1.1rem;
+        line-height: 1.7;
+    }
+
+    .cta-card .btn {
+        position: relative;
+        z-index: 2;
+    }
+
+    /* Demo waveform animation */
+    .demo-waveform {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        height: 80px;
+        margin: 2rem 0;
+    }
+
+    .demo-wave-bar {
+        width: 5px;
+        background: linear-gradient(to top, var(--primary), var(--secondary));
+        border-radius: 3px;
+        animation: demoWave 1.2s ease-in-out infinite;
+    }
+
+    @keyframes demoWave {
+        0%, 100% { height: 15px; opacity: 0.5; }
+        50% { height: 60px; opacity: 1; }
+    }
+
+    /* GitHub link section */
+    .github-section {
+        padding: 4rem 2rem;
+        text-align: center;
+    }
+
+    .github-card {
+        display: inline-flex;
+        align-items: center;
+        gap: 1.5rem;
+        padding: 1.5rem 2.5rem;
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        border-radius: 1rem;
+        transition: all 0.4s ease;
+        text-decoration: none;
+        color: var(--light);
+    }
+
+    .github-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--primary);
+        box-shadow: 0 15px 35px rgba(99, 102, 241, 0.2);
+    }
+
+    .github-card i {
+        font-size: 2.5rem;
+        color: var(--primary);
+    }
+
+    .github-card span {
+        font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+        .hero h1 { font-size: 2.8rem; }
+        .hero p { font-size: 1rem; }
+        .features-grid { grid-template-columns: 1fr; }
+        .cta-card h2 { font-size: 2rem; }
+        .section-title h2 { font-size: 2rem; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <div class="hero-visual">
+        <i class="fas fa-microphone-alt"></i>
+    </div>
+
+    <div class="hero-content">
+        <div class="hero-badge float">
+            <i class="fas fa-bolt"></i>
+            Powered by Artificial Neural Networks v2.0
+        </div>
+        <h1 class="scroll-animate">Understand Emotions<br>Through Voice</h1>
+        <p class="scroll-animate">Advanced speech emotion recognition system that analyzes vocal patterns using deep learning. 
+           Detect 7 emotions in real-time with our ANN-powered dashboard, batch processing, and live visualization.</p>
+
+        <div class="demo-waveform">
+            <div class="demo-wave-bar" style="animation-delay: 0s;"></div>
+            <div class="demo-wave-bar" style="animation-delay: 0.1s;"></div>
+            <div class="demo-wave-bar" style="animation-delay: 0.2s;"></div>
+            <div class="demo-wave-bar" style="animation-delay: 0.3s;"></div>
+            <div class="demo-wave-bar" style="animation-delay: 0.4s;"></div>
+            <div class="demo-wave-bar" style="animation-delay: 0.5s;"></div>
+            <div class="demo-wave-bar" style="animation-delay: 0.6s;"></div>
+            <div class="demo-wave-bar" style="animation-delay: 0.7s;"></div>
+            <div class="demo-wave-bar" style="animation-delay: 0.8s;"></div>
+            <div class="demo-wave-bar" style="animation-delay: 0.9s;"></div>
+            <div class="demo-wave-bar" style="animation-delay: 1.0s;"></div>
+            <div class="demo-wave-bar" style="animation-delay: 1.1s;"></div>
+        </div>
+
+        <div class="hero-buttons">
+            <a href="{{ url_for('register') }}" class="btn btn-primary btn-glow btn-shine particle-btn">
+                <i class="fas fa-rocket"></i>
+                Get Started
+            </a>
+            <a href="{{ url_for('about') }}" class="btn btn-secondary">
+                <i class="fas fa-info-circle"></i>
+                Learn More
+            </a>
+            <a href="{{ url_for('model_page') }}" class="btn btn-secondary">
+                <i class="fas fa-brain"></i>
+                Model Info
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="features-section">
+    <div class="section-title scroll-animate">
+        <h2>Key Features</h2>
+        <p>Everything you need for comprehensive emotion analysis</p>
+    </div>
+    <div class="features-grid stagger-children">
+        <div class="feature-card tilt-card">
+            <div class="feature-icon">
+                <i class="fas fa-brain"></i>
+            </div>
+            <h3>ANN Classification</h3>
+            <p>State-of-the-art Artificial Neural Network with 4 hidden layers, batch normalization, and dropout for robust classification across 7 emotion categories.</p>
+        </div>
+        <div class="feature-card tilt-card">
+            <div class="feature-icon">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <h3>Real-Time Dashboard</h3>
+            <p>Interactive visualization dashboard with live emotion tracking, confidence metrics, trend analysis, and historical data charts with export capabilities.</p>
+        </div>
+        <div class="feature-card tilt-card">
+            <div class="feature-icon">
+                <i class="fas fa-wave-square"></i>
+            </div>
+            <h3>Audio Feature Extraction</h3>
+            <p>Advanced signal processing with 191 features including MFCC, chroma, mel spectrogram, spectral contrast, ZCR, RMS energy, and spectral centroid.</p>
+        </div>
+        <div class="feature-card tilt-card">
+            <div class="feature-icon">
+                <i class="fas fa-history"></i>
+            </div>
+            <h3>Emotion History</h3>
+            <p>Track your emotional journey with detailed history logs, trend analysis, comparison tools, and personalized insights over time.</p>
+        </div>
+        <div class="feature-card tilt-card">
+            <div class="feature-icon">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <h3>Secure & Private</h3>
+            <p>User authentication with encrypted passwords, role-based access control, and secure local audio processing. Your data never leaves the server.</p>
+        </div>
+        <div class="feature-card tilt-card">
+            <div class="feature-icon">
+                <i class="fas fa-bolt"></i>
+            </div>
+            <h3>Batch Processing</h3>
+            <p>Upload multiple audio files simultaneously for batch emotion analysis. Export results to CSV or JSON for further analysis and reporting.</p>
+        </div>
+        <div class="feature-card tilt-card">
+            <div class="feature-icon">
+                <i class="fas fa-microphone"></i>
+            </div>
+            <h3>Live Recording</h3>
+            <p>Record audio directly from your browser with real-time waveform visualization. Instant analysis with animated feedback and probability charts.</p>
+        </div>
+        <div class="feature-card tilt-card">
+            <div class="feature-icon">
+                <i class="fas fa-code-branch"></i>
+            </div>
+            <h3>Open Source</h3>
+            <p>Fully open-source project available on GitHub. Contribute, fork, or customize the codebase to suit your research and development needs.</p>
+        </div>
+    </div>
+</section>
+
+<section class="stats-section">
+    <div class="section-title scroll-animate">
+        <h2>System Capabilities</h2>
+        <p>Built for performance, accuracy, and scalability</p>
+    </div>
+    <div class="stats-grid stagger-children">
+        <div class="stat-item">
+            <div class="stat-number" data-count="7">0</div>
+            <div class="stat-label">Emotion Classes</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number" data-count="191">0</div>
+            <div class="stat-label">Audio Features</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number" data-count="1">0</div>
+            <div class="stat-label">Second Processing</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number" data-count="95">0</div>
+            <div class="stat-label">Percent Accuracy</div>
+        </div>
+    </div>
+</section>
+
+<section class="cta-section">
+    <div class="cta-card">
+        <h2>Ready to Analyze Emotions?</h2>
+        <p>Join thousands of users who are already understanding emotions through voice analysis. 
+           Create your free account and start exploring today with our advanced ANN-powered platform.</p>
+        <a href="{{ url_for('register') }}" class="btn btn-primary btn-glow btn-shine particle-btn">
+            <i class="fas fa-user-plus"></i>
+            Create Free Account
+        </a>
+    </div>
+</section>
+
+<section class="github-section">
+    <a href="{{ github_repo }}" target="_blank" class="github-card">
+        <i class="fab fa-github"></i>
+        <div style="text-align: left;">
+            <span>View on GitHub</span>
+            <p style="font-size: 0.8rem; color: var(--gray); margin: 0;">github.com/issu321/Emotion-Detection-Using-ANN</p>
+        </div>
+    </a>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // GSAP Animations
+    gsap.from('.hero-badge', {
+        y: -50,
+        opacity: 0,
+        duration: 1,
+        ease: "power3.out",
+        delay: 2.2
+    });
+
+    gsap.from('.hero h1', {
+        y: 100,
+        opacity: 0,
+        duration: 1.2,
+        ease: "power3.out",
+        delay: 2.4
+    });
+
+    gsap.from('.hero p', {
+        y: 50,
+        opacity: 0,
+        duration: 1,
+        ease: "power3.out",
+        delay: 2.6
+    });
+
+    gsap.from('.hero-buttons', {
+        y: 30,
+        opacity: 0,
+        duration: 0.8,
+        ease: "power3.out",
+        delay: 2.8
+    });
+
+    gsap.from('.demo-waveform', {
+        scale: 0,
+        opacity: 0,
+        duration: 0.8,
+        ease: "back.out(1.7)",
+        delay: 3
+    });
+
+    // Scroll-triggered animations
+    gsap.utils.toArray('.scroll-animate').forEach(elem => {
+        gsap.from(elem, {
+            scrollTrigger: {
+                trigger: elem,
+                start: "top 85%",
+                toggleActions: "play none none reverse"
+            },
+            y: 50,
+            opacity: 0,
+            duration: 0.8,
+            ease: "power3.out"
+        });
+    });
+
+    // Stagger animations for grids
+    gsap.utils.toArray('.stagger-children').forEach(container => {
+        gsap.from(container.children, {
+            scrollTrigger: {
+                trigger: container,
+                start: "top 80%",
+                toggleActions: "play none none reverse"
+            },
+            y: 60,
+            opacity: 0,
+            duration: 0.6,
+            stagger: 0.15,
+            ease: "power3.out"
+        });
+    });
+
+    // Animated counters
+    const counters = document.querySelectorAll('.stat-number');
+    counters.forEach(counter => {
+        const target = parseInt(counter.getAttribute('data-count'));
+
+        ScrollTrigger.create({
+            trigger: counter,
+            start: "top 85%",
+            onEnter: () => {
+                gsap.to(counter, {
+                    innerHTML: target,
+                    duration: 2,
+                    snap: { innerHTML: 1 },
+                    ease: "power2.out",
+                    onUpdate: function() {
+                        counter.innerHTML = Math.round(this.targets()[0].innerHTML);
+                        if (target === 1) counter.innerHTML = '<1';
+                        if (target === 95) counter.innerHTML = Math.round(this.targets()[0].innerHTML) + '%';
+                    }
+                });
+            },
+            once: true
+        });
+    });
+
+    // Parallax effect for orbs
+    document.addEventListener('mousemove', (e) => {
+        const orbs = document.querySelectorAll('.orb');
+        const x = (e.clientX / window.innerWidth - 0.5) * 30;
+        const y = (e.clientY / window.innerHeight - 0.5) * 30;
+
+        orbs.forEach((orb, i) => {
+            const speed = (i + 1) * 0.5;
+            orb.style.transform = `translate(${x * speed}px, ${y * speed}px)`;
+        });
+    });
+
+    // Feature card hover sound effect (visual feedback)
+    document.querySelectorAll('.feature-card').forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            gsap.to(card.querySelector('.feature-icon'), {
+                scale: 1.1,
+                duration: 0.3,
+                ease: "power2.out"
+            });
+        });
+
+        card.addEventListener('mouseleave', () => {
+            gsap.to(card.querySelector('.feature-icon'), {
+                scale: 1,
+                duration: 0.3,
+                ease: "power2.out"
+            });
+        });
+    });
+</script>
+{% endblock %}

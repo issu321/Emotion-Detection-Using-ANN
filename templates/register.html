@@ -1,0 +1,333 @@
+{% extends "base.html" %}
+
+{% block title %}Register - Emotion-Detection-Using-ANN{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .auth-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        position: relative;
+    }
+
+    .auth-card {
+        width: 100%;
+        max-width: 450px;
+        background: var(--glass);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 1.5rem;
+        padding: 3rem;
+        position: relative;
+        overflow: hidden;
+        animation: cardFloat 0.8s ease;
+        z-index: 1;
+    }
+
+    @keyframes cardFloat {
+        from { opacity: 0; transform: translateY(40px) scale(0.95); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .auth-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+        animation: gradientShift 3s ease infinite;
+        background-size: 200% 200%;
+    }
+
+    .auth-card::after {
+        content: '';
+        position: absolute;
+        inset: -1px;
+        border-radius: 1.5rem;
+        background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: -1;
+        filter: blur(20px);
+    }
+
+    .auth-card:hover::after {
+        opacity: 0.3;
+    }
+
+    .auth-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+
+    .auth-header .logo-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 1.5rem;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        font-size: 2rem;
+        color: white;
+        animation: iconPulse 3s ease infinite;
+        box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+    }
+
+    @keyframes iconPulse {
+        0%, 100% { transform: scale(1); box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4); }
+        50% { transform: scale(1.05); box-shadow: 0 15px 40px rgba(236, 72, 153, 0.5); }
+    }
+
+    .auth-header h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .auth-header p {
+        color: var(--gray);
+        font-size: 0.875rem;
+    }
+
+    .auth-form .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .input-wrapper {
+        position: relative;
+    }
+
+    .input-wrapper i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray);
+        transition: all 0.3s ease;
+    }
+
+    .input-wrapper .form-input:focus + i {
+        color: var(--primary);
+    }
+
+    .input-wrapper .form-input {
+        padding-left: 3rem;
+    }
+
+    .auth-footer {
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--glass-border);
+    }
+
+    .auth-footer p {
+        color: var(--gray);
+        font-size: 0.875rem;
+    }
+
+    .auth-footer a {
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .auth-footer a:hover {
+        text-decoration: underline;
+        color: var(--secondary);
+    }
+
+    .btn-full {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .password-strength {
+        height: 6px;
+        background: var(--glass-border);
+        border-radius: 3px;
+        margin-top: 0.5rem;
+        overflow: hidden;
+    }
+
+    .password-strength-bar {
+        height: 100%;
+        width: 0;
+        border-radius: 3px;
+        transition: all 0.4s ease;
+        position: relative;
+    }
+
+    .password-strength-bar::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        animation: shimmer 1.5s ease infinite;
+    }
+
+    @keyframes shimmer {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+    }
+
+    .terms {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+        color: var(--gray);
+        font-size: 0.875rem;
+    }
+
+    .terms input {
+        margin-top: 0.25rem;
+        accent-color: var(--primary);
+    }
+
+    .terms a {
+        color: var(--primary);
+        text-decoration: none;
+    }
+
+    .floating-shapes {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        pointer-events: none !important;
+        overflow: hidden;
+        z-index: 0;
+    }
+
+    .shape {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(80px);
+        opacity: 0.2;
+        animation: shapeFloat 10s ease-in-out infinite;
+    }
+
+    .shape-1 {
+        width: 300px;
+        height: 300px;
+        background: var(--primary);
+        top: -100px;
+        left: -100px;
+    }
+
+    .shape-2 {
+        width: 250px;
+        height: 250px;
+        background: var(--secondary);
+        bottom: -50px;
+        right: -50px;
+        animation-delay: 3s;
+    }
+
+    @keyframes shapeFloat {
+        0%, 100% { transform: translate(0, 0) scale(1); }
+        50% { transform: translate(30px, -30px) scale(1.1); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="floating-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+    </div>
+
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="logo-icon">
+                <i class="fas fa-user-plus"></i>
+            </div>
+            <h2>Create Account</h2>
+            <p>Join Emotion-Detection-Using-ANN to start analyzing emotions</p>
+        </div>
+
+        <form class="auth-form" method="POST" action="{{ url_for('register') }}">
+            <div class="form-group">
+                <label class="form-label">Username</label>
+                <div class="input-wrapper">
+                    <input type="text" name="username" class="form-input" placeholder="Choose a username" required minlength="3">
+                    <i class="fas fa-user"></i>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <div class="input-wrapper">
+                    <input type="email" name="email" class="form-input" placeholder="Enter your email" required>
+                    <i class="fas fa-envelope"></i>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <div class="input-wrapper">
+                    <input type="password" name="password" id="password" class="form-input" placeholder="Create a password" required minlength="6">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <div class="password-strength">
+                    <div class="password-strength-bar" id="strength-bar"></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Confirm Password</label>
+                <div class="input-wrapper">
+                    <input type="password" name="confirm_password" class="form-input" placeholder="Confirm your password" required>
+                    <i class="fas fa-lock"></i>
+                </div>
+            </div>
+
+            <label class="terms">
+                <input type="checkbox" required>
+                <span>I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></span>
+            </label>
+
+            <button type="submit" class="btn btn-primary btn-full btn-glow btn-shine particle-btn">
+                <i class="fas fa-user-plus"></i>
+                Create Account
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            <p>Already have an account? <a href="{{ url_for('login') }}">Sign in</a></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('password').addEventListener('input', function() {
+        const password = this.value;
+        const bar = document.getElementById('strength-bar');
+        let strength = 0;
+
+        if (password.length >= 6) strength += 25;
+        if (password.length >= 10) strength += 25;
+        if (/[A-Z]/.test(password)) strength += 25;
+        if (/[0-9!@#$%^&*]/.test(password)) strength += 25;
+
+        bar.style.width = strength + '%';
+
+        if (strength <= 25) bar.style.background = '#ef4444';
+        else if (strength <= 50) bar.style.background = '#f59e0b';
+        else if (strength <= 75) bar.style.background = '#3b82f6';
+        else bar.style.background = '#10b981';
+    });
+</script>
+{% endblock %}

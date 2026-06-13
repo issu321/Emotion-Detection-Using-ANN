@@ -1,0 +1,461 @@
+{% extends "base.html" %}
+
+{% block title %}About - Emotion-Detection-Using-ANN{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .about-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 4rem 2rem;
+    }
+
+    .about-header {
+        text-align: center;
+        margin-bottom: 4rem;
+        animation: fadeInUp 0.8s ease;
+    }
+
+    .about-header h1 {
+        font-size: 3.5rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #fff, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .about-header p {
+        color: var(--gray);
+        font-size: 1.25rem;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .about-section {
+        margin-bottom: 4rem;
+        animation: fadeInUp 0.8s ease;
+    }
+
+    .about-section h2 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .about-section h2 i {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .about-section p {
+        color: var(--gray);
+        line-height: 1.8;
+        font-size: 1.05rem;
+    }
+
+    .tech-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .tech-card {
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: all 0.4s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .tech-card::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 3px;
+        height: 100%;
+        background: linear-gradient(to bottom, var(--primary), var(--secondary));
+        transform: scaleY(0);
+        transition: transform 0.3s ease;
+    }
+
+    .tech-card:hover::before {
+        transform: scaleY(1);
+    }
+
+    .tech-card:hover {
+        transform: translateX(10px) scale(1.02);
+        border-color: var(--primary);
+    }
+
+    .tech-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        flex-shrink: 0;
+        transition: all 0.3s ease;
+    }
+
+    .tech-card:hover .tech-icon {
+        transform: rotateY(360deg);
+    }
+
+    .tech-card h4 {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+
+    .tech-card span {
+        color: var(--gray);
+        font-size: 0.875rem;
+    }
+
+    .workflow {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .workflow-step {
+        display: flex;
+        align-items: flex-start;
+        gap: 1.5rem;
+        padding: 1.5rem;
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        border-radius: 1rem;
+        transition: all 0.4s ease;
+        position: relative;
+    }
+
+    .workflow-step:hover {
+        border-color: var(--primary);
+        transform: translateX(10px);
+    }
+
+    .step-number {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.25rem;
+        flex-shrink: 0;
+        animation: stepPulse 2s ease infinite;
+    }
+
+    @keyframes stepPulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
+        50% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
+    }
+
+    .step-content h4 {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .step-content p {
+        color: var(--gray);
+        font-size: 0.95rem;
+    }
+
+    .team-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .team-card {
+        text-align: center;
+        padding: 2rem;
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        border-radius: 1rem;
+        transition: all 0.4s ease;
+    }
+
+    .team-card:hover {
+        transform: translateY(-10px);
+        border-color: var(--primary);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .team-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        margin: 0 auto 1rem;
+        color: white;
+        animation: avatarSpin 5s ease infinite;
+    }
+
+    @keyframes avatarSpin {
+        0%, 100% { transform: rotate(0deg); }
+        50% { transform: rotate(5deg); }
+    }
+
+    .team-card h4 {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+
+    .team-card span {
+        color: var(--gray);
+        font-size: 0.875rem;
+    }
+
+    .github-banner {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(236, 72, 153, 0.1));
+        border: 1px solid var(--glass-border);
+        border-radius: 1rem;
+        padding: 2rem;
+        text-align: center;
+        margin-top: 2rem;
+        transition: all 0.4s ease;
+    }
+
+    .github-banner:hover {
+        border-color: var(--primary);
+        transform: translateY(-5px);
+    }
+
+    .github-banner a {
+        display: inline-flex;
+        align-items: center;
+        gap: 1rem;
+        color: var(--light);
+        text-decoration: none;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .github-banner i {
+        font-size: 2rem;
+        color: var(--primary);
+    }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="about-container">
+    <div class="about-header">
+        <h1>About Emotion-Detection-Using-ANN</h1>
+        <p>Revolutionizing emotion detection through the power of voice and artificial intelligence</p>
+    </div>
+
+    <div class="about-section">
+        <h2><i class="fas fa-bullseye"></i> Our Mission</h2>
+        <p>Emotion-Detection-Using-ANN is dedicated to advancing the field of affective computing by providing an accessible, accurate, and real-time speech emotion recognition system. We believe that understanding emotions through voice can transform industries from mental health to customer service, education, and beyond. Our mission is to make emotion AI technology available to everyone through an intuitive and powerful platform.</p>
+    </div>
+
+    <div class="about-section">
+        <h2><i class="fas fa-cogs"></i> Technology Stack</h2>
+        <p>Our system leverages cutting-edge technologies to deliver accurate and fast emotion recognition:</p>
+        <div class="tech-grid">
+            <div class="tech-card">
+                <div class="tech-icon" style="background: rgba(99, 102, 241, 0.2); color: var(--primary);">
+                    <i class="fab fa-python"></i>
+                </div>
+                <div>
+                    <h4>Python</h4>
+                    <span>Core Backend</span>
+                </div>
+            </div>
+            <div class="tech-card">
+                <div class="tech-icon" style="background: rgba(16, 185, 129, 0.2); color: var(--success);">
+                    <i class="fas fa-flask"></i>
+                </div>
+                <div>
+                    <h4>Flask</h4>
+                    <span>Web Framework</span>
+                </div>
+            </div>
+            <div class="tech-card">
+                <div class="tech-icon" style="background: rgba(6, 182, 212, 0.2); color: var(--accent);">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <div>
+                    <h4>ANN</h4>
+                    <span>Neural Network</span>
+                </div>
+            </div>
+            <div class="tech-card">
+                <div class="tech-icon" style="background: rgba(236, 72, 153, 0.2); color: var(--secondary);">
+                    <i class="fas fa-music"></i>
+                </div>
+                <div>
+                    <h4>Librosa</h4>
+                    <span>Audio Processing</span>
+                </div>
+            </div>
+            <div class="tech-card">
+                <div class="tech-icon" style="background: rgba(245, 158, 11, 0.2); color: var(--warning);">
+                    <i class="fas fa-chart-pie"></i>
+                </div>
+                <div>
+                    <h4>Chart.js</h4>
+                    <span>Data Visualization</span>
+                </div>
+            </div>
+            <div class="tech-card">
+                <div class="tech-icon" style="background: rgba(239, 68, 68, 0.2); color: var(--danger);">
+                    <i class="fas fa-database"></i>
+                </div>
+                <div>
+                    <h4>SQLite</h4>
+                    <span>Data Storage</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="about-section">
+        <h2><i class="fas fa-project-diagram"></i> How It Works</h2>
+        <p>Our end-to-end pipeline processes audio through several sophisticated stages:</p>
+        <div class="workflow">
+            <div class="workflow-step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h4>Audio Collection</h4>
+                    <p>Users upload audio files (WAV, MP3, OGG, M4A, FLAC, WEBM) through our intuitive web interface. The system accepts recordings up to 32MB in size.</p>
+                </div>
+            </div>
+            <div class="workflow-step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h4>Signal Preprocessing</h4>
+                    <p>Audio signals are normalized, resampled to a standard rate, and segmented into 3-second clips for consistent analysis.</p>
+                </div>
+            </div>
+            <div class="workflow-step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h4>Feature Extraction</h4>
+                    <p>We extract 191 features including 40 MFCCs, 12 chroma features, 128 mel spectrogram bins, spectral contrast, ZCR, RMS energy, and spectral centroid using Librosa.</p>
+                </div>
+            </div>
+            <div class="workflow-step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h4>ANN Classification</h4>
+                    <p>The Artificial Neural Network processes extracted features through 4 hidden layers (256, 128, 64, 32 neurons) with ReLU activation, batch normalization, dropout, and softmax output for 7 emotion classes.</p>
+                </div>
+            </div>
+            <div class="workflow-step">
+                <div class="step-number">5</div>
+                <div class="step-content">
+                    <h4>Real-Time Dashboard</h4>
+                    <p>Results are displayed instantly with confidence scores, probability distributions, waveform visualization, and stored in your personal history for trend analysis.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="about-section">
+        <h2><i class="fas fa-users"></i> Emotion Classes</h2>
+        <p>Our ANN model is trained to recognize seven fundamental human emotions from speech:</p>
+        <div class="tech-grid">
+            <div class="tech-card">
+                <div class="tech-icon" style="background: rgba(156, 163, 175, 0.2); color: #9CA3AF;">
+                    <i class="fas fa-meh"></i>
+                </div>
+                <div>
+                    <h4>Neutral</h4>
+                    <span>Calm, balanced tone</span>
+                </div>
+            </div>
+            <div class="tech-card">
+                <div class="tech-icon" style="background: rgba(251, 191, 36, 0.2); color: #FBBF24;">
+                    <i class="fas fa-smile"></i>
+                </div>
+                <div>
+                    <h4>Happy</h4>
+                    <span>Joyful, upbeat speech</span>
+                </div>
+            </div>
+            <div class="tech-card">
+                <div class="tech-icon" style="background: rgba(96, 165, 250, 0.2); color: #60A5FA;">
+                    <i class="fas fa-sad-tear"></i>
+                </div>
+                <div>
+                    <h4>Sad</h4>
+                    <span>Melancholic, low energy</span>
+                </div>
+            </div>
+            <div class="tech-card">
+                <div class="tech-icon" style="background: rgba(239, 68, 68, 0.2); color: #EF4444;">
+                    <i class="fas fa-angry"></i>
+                </div>
+                <div>
+                    <h4>Angry</h4>
+                    <span>Intense, harsh tone</span>
+                </div>
+            </div>
+            <div class="tech-card">
+                <div class="tech-icon" style="background: rgba(167, 139, 250, 0.2); color: #A78BFA;">
+                    <i class="fas fa-grimace"></i>
+                </div>
+                <div>
+                    <h4>Fearful</h4>
+                    <span>Anxious, trembling voice</span>
+                </div>
+            </div>
+            <div class="tech-card">
+                <div class="tech-icon" style="background: rgba(16, 185, 129, 0.2); color: #10B981;">
+                    <i class="fas fa-dizzy"></i>
+                </div>
+                <div>
+                    <h4>Disgusted</h4>
+                    <span>Revulsion, aversion</span>
+                </div>
+            </div>
+            <div class="tech-card">
+                <div class="tech-icon" style="background: rgba(249, 115, 22, 0.2); color: #F97316;">
+                    <i class="fas fa-surprise"></i>
+                </div>
+                <div>
+                    <h4>Surprised</h4>
+                    <span>Astonishment, shock</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="github-banner">
+        <a href="{{ github_repo }}" target="_blank">
+            <i class="fab fa-github"></i>
+            <span>View Project on GitHub - github.com/issu321/Emotion-Detection-Using-ANN</span>
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,314 @@
+{% extends "base.html" %}
+
+{% block title %}Features - Emotion-Detection-Using-ANN{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .features-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 4rem 2rem;
+    }
+
+    .features-header {
+        text-align: center;
+        margin-bottom: 4rem;
+    }
+
+    .features-header h1 {
+        font-size: 3.5rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #fff, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .features-header p {
+        color: var(--gray);
+        font-size: 1.25rem;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .feature-showcase {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        align-items: center;
+        margin-bottom: 5rem;
+    }
+
+    .feature-showcase.reverse {
+        direction: rtl;
+    }
+
+    .feature-showcase.reverse > * {
+        direction: ltr;
+    }
+
+    .feature-image {
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        border-radius: 1.5rem;
+        padding: 2rem;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.4s ease;
+    }
+
+    .feature-image::before {
+        content: '';
+        position: absolute;
+        inset: -1px;
+        border-radius: 1.5rem;
+        background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+        opacity: 0.3;
+        z-index: -1;
+        filter: blur(15px);
+        animation: glowPulse 3s ease infinite;
+    }
+
+    @keyframes glowPulse {
+        0%, 100% { opacity: 0.2; }
+        50% { opacity: 0.4; }
+    }
+
+    .feature-image:hover {
+        transform: scale(1.05);
+    }
+
+    .feature-image i {
+        font-size: 8rem;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        display: block;
+        text-align: center;
+        animation: iconFloat 4s ease-in-out infinite;
+    }
+
+    @keyframes iconFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-15px); }
+    }
+
+    .feature-content h2 {
+        font-size: 2.2rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    .feature-content p {
+        color: var(--gray);
+        line-height: 1.8;
+        margin-bottom: 1.5rem;
+        font-size: 1.05rem;
+    }
+
+    .feature-list {
+        list-style: none;
+    }
+
+    .feature-list li {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+        color: var(--light);
+        transition: all 0.3s ease;
+    }
+
+    .feature-list li:hover {
+        transform: translateX(10px);
+    }
+
+    .feature-list li i {
+        color: var(--success);
+        font-size: 1.1rem;
+    }
+
+    .feature-grid-3 {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-top: 3rem;
+    }
+
+    .feature-card-large {
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        border-radius: 1rem;
+        padding: 2.5rem;
+        transition: all 0.4s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .feature-card-large:hover {
+        border-color: var(--primary);
+        transform: translateY(-10px) scale(1.02);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+    }
+
+    .feature-card-large::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+    }
+
+    .feature-card-large:hover::before {
+        transform: scaleX(1);
+    }
+
+    .feature-card-large .icon-large {
+        width: 60px;
+        height: 60px;
+        border-radius: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+        transition: all 0.4s ease;
+    }
+
+    .feature-card-large:hover .icon-large {
+        transform: rotateY(360deg) scale(1.1);
+    }
+
+    .feature-card-large h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+    }
+
+    .feature-card-large p {
+        color: var(--gray);
+        line-height: 1.6;
+    }
+
+    @media (max-width: 768px) {
+        .feature-showcase {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+        .feature-showcase.reverse {
+            direction: ltr;
+        }
+        .features-header h1 { font-size: 2.2rem; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="features-container">
+    <div class="features-header">
+        <h1>Powerful Features</h1>
+        <p>Discover everything Emotion-Detection-Using-ANN can do to help you understand emotions through speech</p>
+    </div>
+
+    <div class="feature-showcase">
+        <div class="feature-content">
+            <h2>Real-Time Emotion Detection</h2>
+            <p>Upload any audio file and get instant emotion analysis. Our ANN model processes audio in under 1 second, delivering accurate predictions with confidence scores for all 7 emotion classes.</p>
+            <ul class="feature-list">
+                <li><i class="fas fa-check-circle"></i> Instant processing under 1 second</li>
+                <li><i class="fas fa-check-circle"></i> Support for WAV, MP3, OGG, M4A, FLAC, WEBM</li>
+                <li><i class="fas fa-check-circle"></i> Confidence scores for all predictions</li>
+                <li><i class="fas fa-check-circle"></i> Detailed probability distribution</li>
+                <li><i class="fas fa-check-circle"></i> Animated waveform visualization</li>
+            </ul>
+        </div>
+        <div class="feature-image">
+            <i class="fas fa-bolt"></i>
+        </div>
+    </div>
+
+    <div class="feature-showcase reverse">
+        <div class="feature-content">
+            <h2>Advanced Audio Feature Extraction</h2>
+            <p>Our system extracts 191 acoustic features using Librosa, including 40 MFCCs, 12 chroma features, 128 mel spectrogram bins, spectral contrast, and temporal features for comprehensive analysis.</p>
+            <ul class="feature-list">
+                <li><i class="fas fa-check-circle"></i> 40 MFCC coefficients</li>
+                <li><i class="fas fa-check-circle"></i> Chroma energy features</li>
+                <li><i class="fas fa-check-circle"></i> Mel-frequency spectrogram</li>
+                <li><i class="fas fa-check-circle"></i> Spectral contrast analysis</li>
+                <li><i class="fas fa-check-circle"></i> Zero-crossing rate & RMS energy</li>
+                <li><i class="fas fa-check-circle"></i> Spectral centroid & rolloff</li>
+            </ul>
+        </div>
+        <div class="feature-image">
+            <i class="fas fa-wave-square"></i>
+        </div>
+    </div>
+
+    <div class="feature-showcase">
+        <div class="feature-content">
+            <h2>Interactive Dashboard</h2>
+            <p>Visualize your emotion analysis results with beautiful, interactive charts. Track your emotional patterns over time with detailed statistics, trend analysis, and export capabilities.</p>
+            <ul class="feature-list">
+                <li><i class="fas fa-check-circle"></i> Real-time probability charts</li>
+                <li><i class="fas fa-check-circle"></i> Emotion distribution pie chart</li>
+                <li><i class="fas fa-check-circle"></i> Historical trend analysis</li>
+                <li><i class="fas fa-check-circle"></i> Confidence score tracking</li>
+                <li><i class="fas fa-check-circle"></i> Export to CSV/JSON</li>
+            </ul>
+        </div>
+        <div class="feature-image">
+            <i class="fas fa-chart-line"></i>
+        </div>
+    </div>
+
+    <div class="feature-grid-3">
+        <div class="feature-card-large">
+            <div class="icon-large" style="background: rgba(99, 102, 241, 0.2); color: var(--primary);">
+                <i class="fas fa-brain"></i>
+            </div>
+            <h3>ANN Architecture</h3>
+            <p>Multi-layer neural network with 4 hidden layers (256, 128, 64, 32 neurons), batch normalization, and dropout for robust speech emotion recognition performance.</p>
+        </div>
+        <div class="feature-card-large">
+            <div class="icon-large" style="background: rgba(16, 185, 129, 0.2); color: var(--success);">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <h3>Secure & Private</h3>
+            <p>User authentication with encrypted passwords, role-based access control, and secure local audio processing. Your data remains private and secure.</p>
+        </div>
+        <div class="feature-card-large">
+            <div class="icon-large" style="background: rgba(236, 72, 153, 0.2); color: var(--secondary);">
+                <i class="fas fa-history"></i>
+            </div>
+            <h3>Emotion History</h3>
+            <p>Complete history of all your emotion analyses with timestamps, confidence scores, batch processing support, and downloadable reports for personal tracking.</p>
+        </div>
+        <div class="feature-card-large">
+            <div class="icon-large" style="background: rgba(6, 182, 212, 0.2); color: var(--accent);">
+                <i class="fas fa-mobile-alt"></i>
+            </div>
+            <h3>Responsive Design</h3>
+            <p>Access your dashboard from any device. Fully responsive interface with dark/light mode, optimized for desktop, tablet, and mobile experiences.</p>
+        </div>
+        <div class="feature-card-large">
+            <div class="icon-large" style="background: rgba(245, 158, 11, 0.2); color: var(--warning);">
+                <i class="fas fa-file-audio"></i>
+            </div>
+            <h3>Multiple Formats</h3>
+            <p>Support for all major audio formats including WAV, MP3, OGG, M4A, FLAC, and WEBM with automatic format detection and batch upload capabilities.</p>
+        </div>
+        <div class="feature-card-large">
+            <div class="icon-large" style="background: rgba(239, 68, 68, 0.2); color: var(--danger);">
+                <i class="fas fa-tachometer-alt"></i>
+            </div>
+            <h3>High Performance</h3>
+            <p>Optimized processing pipeline with efficient feature extraction and fast inference. Handles files up to 32MB with real-time waveform animation.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
